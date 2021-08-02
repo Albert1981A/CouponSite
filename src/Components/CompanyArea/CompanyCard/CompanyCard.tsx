@@ -1,5 +1,5 @@
 import "./CompanyCard.css";
-import React from 'react';
+import React, { Component } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -10,6 +10,16 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import CompaniesImage from "../../../Assets/images/companies.jpg";
 import { ButtonGroup } from "@material-ui/core";
+import CompanyModel from "../../../Models/CompanyModel";
+import CouponsModel from "../../../Models/CouponsModel";
+
+interface CardProps {
+    company: CompanyModel;
+}
+
+interface CouponListState {
+    coupons: CouponsModel[];
+}
 
 const useStyles = makeStyles({
     root: {
@@ -20,42 +30,53 @@ const useStyles = makeStyles({
     },
 });
 
-function CompanyCard(): JSX.Element {
-    const classes = useStyles();
+class CompanyCard extends Component<CardProps, CouponListState> {
 
-    return (
-        <Card className={classes.root}>
+    public constructor(props: CardProps) {
+        super(props);
+        this.state = {
+            coupons: null//store.getState().catState.cats
+        };
+    }
 
-            <CardActionArea >
+    private classes = useStyles();
+    public render(): JSX.Element {
+        
 
-                <CardMedia
-                    className={classes.media}
-                    image={CompaniesImage}
-                    title="Contemplative Reptile"
-                />
+        return (
+            <Card className={this.classes.root}>
 
-                <CardContent>
-                    <Typography gutterBottom variant="h6" component="h2">
-                        Company name
-                    </Typography>
+                <CardActionArea >
 
-                    <Typography variant="body2" color="textSecondary" component="p">
-                        Company title
-                    </Typography>
-                </CardContent>
+                    <CardMedia
+                        className={this.classes.media}
+                        image={CompaniesImage}
+                        title="Contemplative Reptile"
+                    />
 
-            </CardActionArea>
+                    <CardContent>
+                        <Typography gutterBottom variant="h6" component="h2">
+                            Company name
+                        </Typography>
 
-            <CardActions>
-                <p>Operations:</p>
-                <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
-                    <Button>Update</Button>
-                    <Button>Delete</Button>
-                </ButtonGroup>
-            </CardActions>
+                        <Typography variant="body2" color="textSecondary" component="p">
+                            Company title
+                        </Typography>
+                    </CardContent>
 
-        </Card>
-    );
+                </CardActionArea>
+
+                <CardActions>
+                    <p>Operations:</p>
+                    <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
+                        <Button>Update</Button>
+                        <Button>Delete</Button>
+                    </ButtonGroup>
+                </CardActions>
+
+            </Card>
+        );
+    }
 }
 
 export default CompanyCard;

@@ -1,14 +1,25 @@
 import { Button, ButtonGroup, Typography } from "@material-ui/core";
 import { Component } from "react";
+import CouponsModel from "../../../Models/CouponsModel";
 import CompanyCard from "../CompanyCard/CompanyCard";
 import "./CompanyCoupons.css";
 
-class CompanyCoupons extends Component {
+interface CouponListState {
+    coupons: CouponsModel[];
+}
+
+class CompanyCoupons extends Component<{}, CouponListState> {
+
+    public constructor(props: {}) {
+        super(props);
+        this.state = {
+            coupons: null//store.getState().catState.cats
+        };
+    }
 
     public render(): JSX.Element {
         return (
             <div className="CompanyCoupons">
-
 
                 <h2 className="head">Company Coupons	&nbsp; &nbsp;</h2>
 
@@ -26,7 +37,7 @@ class CompanyCoupons extends Component {
                     If an existing coupon is updated, it is not possible to update the coupon code. Also, you cannot updated the company code.
                 </Typography>
 
-                <CompanyCard />
+                <CompanyCard company={null}/>
 
             </div>
         );
