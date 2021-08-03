@@ -10,58 +10,62 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import CompaniesImage from "../../../Assets/images/companies.jpg";
 import { ButtonGroup } from "@material-ui/core";
+import CouponModel from "../../../Models/CouponModel";
 import CompanyModel from "../../../Models/CompanyModel";
-import CouponsModel from "../../../Models/CouponsModel";
+import { DateRangeRounded } from "@material-ui/icons";
+import moment from 'moment'
 
 interface CardProps {
-    company: CompanyModel;
-}
-
-interface CouponListState {
-    coupons: CouponsModel[];
+    coupon: CouponModel;
 }
 
 const useStyles = makeStyles({
     root: {
-        maxWidth: 250,
+        // maxWidth: 300,
+        width: 300,
     },
     media: {
         height: 110,
     },
 });
 
-class CompanyCard extends Component<CardProps, CouponListState> {
 
-    public constructor(props: CardProps) {
-        super(props);
-        this.state = {
-            coupons: null//store.getState().catState.cats
-        };
-    }
+function CompanyCard(_props: CardProps): JSX.Element {
+    
+    const classes = useStyles();
 
-    private classes = useStyles();
-    public render(): JSX.Element {
-        
+    const startDate = moment(_props.coupon.startDate).format('D/M/YYYY');
+    const endDate = moment(_props.coupon.endDate).format('D/M/YYYY');
 
-        return (
-            <Card className={this.classes.root}>
+    return (
+        <div>
+            <Card className={classes.root}>
 
                 <CardActionArea >
 
                     <CardMedia
-                        className={this.classes.media}
+                        className={classes.media}
+                        //image={_props.coupon.image}
                         image={CompaniesImage}
                         title="Contemplative Reptile"
                     />
 
+
                     <CardContent>
                         <Typography gutterBottom variant="h6" component="h2">
-                            Company name
+                            Company ID: {_props.coupon.companyID} <br />
+                            {_props.coupon.title}
                         </Typography>
 
                         <Typography variant="body2" color="textSecondary" component="p">
-                            Company title
+                        Category: &nbsp; {_props.coupon.category} <br />
+                            Description: &nbsp; {_props.coupon.description} <br />
+                            Amount: &nbsp; {_props.coupon.amount} <br />
+                            Start-Date: &nbsp; {startDate} <br />
+                            End-Date: &nbsp; {endDate} <br />
+                            Price: &nbsp; {_props.coupon.price}
                         </Typography>
+
                     </CardContent>
 
                 </CardActionArea>
@@ -75,8 +79,9 @@ class CompanyCard extends Component<CardProps, CouponListState> {
                 </CardActions>
 
             </Card>
-        );
-    }
+        </div>
+    );
 }
+
 
 export default CompanyCard;
