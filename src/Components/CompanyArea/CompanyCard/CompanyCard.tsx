@@ -14,6 +14,10 @@ import CouponModel from "../../../Models/CouponModel";
 import CompanyModel from "../../../Models/CompanyModel";
 import { DateRangeRounded } from "@material-ui/icons";
 import moment from 'moment'
+import axios from "axios";
+import globals from "../../../Service/Globals";
+import { couponsDeletedAction } from "../../../Redux/CouponsState";
+import store from "../../../Redux/Store";
 
 interface CardProps {
     coupon: CouponModel;
@@ -29,13 +33,24 @@ const useStyles = makeStyles({
     },
 });
 
-
 function CompanyCard(_props: CardProps): JSX.Element {
     
     const classes = useStyles();
 
     const startDate = moment(_props.coupon.startDate).format('D/M/YYYY');
     const endDate = moment(_props.coupon.endDate).format('D/M/YYYY');
+
+    async function deleteCat(id: number):Promise<void> { 
+        const result = window.confirm("Are you sure you want to delete cat id - " + id + "?");
+        if (result) {
+            try {
+                const response = await axios.delete<any>(globals.urls.company + "coupons/" + id);
+                store.dispatch(couponsDeletedAction(id)); // updating AppState (global state)
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    }
 
     return (
         <div>
@@ -74,7 +89,7 @@ function CompanyCard(_props: CardProps): JSX.Element {
                     <p>Operations:</p>
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
                         <Button>Update</Button>
-                        <Button>Delete</Button>
+                        <Button onClick={() => deleteCat(_props.coupon.id)}>Delete</Button>
                     </ButtonGroup>
                 </CardActions>
 
@@ -82,6 +97,5 @@ function CompanyCard(_props: CardProps): JSX.Element {
         </div>
     );
 }
-
 
 export default CompanyCard;

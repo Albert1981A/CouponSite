@@ -18,7 +18,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 import clsx from "clsx";
-import { AssignmentInd, Business, Home, Info } from "@material-ui/icons";
+import { AssignmentInd, Business, ExitToApp, Home, Info, LockOpen, PersonAdd } from "@material-ui/icons";
 import Routing from "../Routing/Routing";
 import { BrowserRouter, Link, NavLink, useHistory, withRouter } from "react-router-dom";
 
@@ -115,6 +115,26 @@ function Layout(): JSX.Element {
 
     //const { history } = props;
     const itemList = [{
+        text: 'Register',
+        icon: <PersonAdd />,
+        link: "/register"
+        // onClick: () => history.push("/register")
+    }, {
+        text: 'addCoupon',
+        icon: <LockOpen />,
+        link: "/add-coupon"
+        //onClick: () => history.push("/login")
+    }, {
+        text: 'Login',
+        icon: <LockOpen />,
+        link: "/login"
+        //onClick: () => history.push("/login")
+    }, {
+        text: 'Logout',
+        icon: <ExitToApp />,
+        link: "/logout"
+        //onClick: () => history.push("/logout")
+    }, {
         text: 'About',
         icon: <Info />,
         link: "/about"

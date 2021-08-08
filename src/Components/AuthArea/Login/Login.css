@@ -1,0 +1,29 @@
+.Login {
+	align-items: center;
+}
+
+.Login span{
+    color:tomato;
+}
+
+.Login {
+	align-items: center;
+}
+
+.Login input{    
+    width: 250px;
+    /* box-sizing: border-box; */
+
+}
+
+.Login button{
+    
+    margin: 10px 0;
+    width: 100%;
+
+}
+
+.Login > form{
+    text-align: left;
+    align-items: flex-start;
+}

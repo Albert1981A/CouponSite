@@ -5,7 +5,8 @@ class DevelopmentGlobals extends Globals{
     public urls = {
         admin: "http://localhost:8080/admin-service/",
         company: "http://localhost:8080/company-service/",
-        customer: "http://localhost:8080/customer-service/"
+        customer: "http://localhost:8080/customer-service/",
+        client:  "http://localhost:8080/client/"
 
         // cats: "http://localhost:8080/api/cats/"
         // kittens: "https://raw.githubusercontent.com/KobiShashs/Caas-Resources/master/cats.json"
@@ -17,7 +18,8 @@ class ProductionGlobals extends Globals{
     public urls = {
         admin: "http://localhost:8080/admin-service/",
         company: "http://localhost:8080/company-service/",
-        customer: "http://localhost:8080/customer-service/"
+        customer: "http://localhost:8080/customer-service/",
+        client:  "http://localhost:8080/client/"
 
         // cats: "http://localhost:8080/api/cats/"
         // image: "http://localhost:8080/api/cats/images/"
