@@ -51,8 +51,10 @@ export function customersReducer(currentState: CustomersAppState = new Customers
             newState.customers.push(action.payload);
             break;
         case CustomersActionType.CustomerUpdated:
-            // const idx = newState.coupons.filter(c => c.id === action.payload.id);
-            // newState.coupons[idx] = action.payload;
+            // const idx = newState.customers.filter(c => c.id === action.payload.id);
+            // newState.customers[idx] = action.payload;
+            const idx = newState.customers.findIndex(c => c.id === action.payload.id);
+            newState.customers[idx] = action.payload;
             break;
         case CustomersActionType.CustomerDeleted:
             newState.customers = newState.customers.filter(c => c.id !== action.payload);

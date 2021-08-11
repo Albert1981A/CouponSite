@@ -1,10 +1,9 @@
 class UserModel{
-    public id: number;
-    public first: string;
-    public last: string;
-    public email: string;
-    public password: string;
-    public type: string;
-    public token: string
+    public clientId : number;
+    public clientToken? : string;
+    public clientName: string;
+    public clientEmail: string;
+    public clientType: string;
 }
+
 export default UserModel;

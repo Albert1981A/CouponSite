@@ -21,6 +21,7 @@ import clsx from "clsx";
 import { AssignmentInd, Business, ExitToApp, Home, Info, LockOpen, PersonAdd } from "@material-ui/icons";
 import Routing from "../Routing/Routing";
 import { BrowserRouter, Link, NavLink, useHistory, withRouter } from "react-router-dom";
+import AuthMenu from "../../AuthArea/AuthMenu/AuthMenu";
 
 const drawerWidth = 240;
 
@@ -84,9 +85,15 @@ const useStyles = makeStyles((theme: Theme) =>
         content: {
             flexGrow: 1,
             padding: theme.spacing(3),
+            // display: 'flex',
+            // flexDirection: 'row',
+            // justifyContent: 'center',
         },
     }),
 );
+// display: flex;
+//     flex-direction: row;
+//     justify-content: center;
 
 function Layout(): JSX.Element {
 
@@ -154,40 +161,50 @@ function Layout(): JSX.Element {
         icon: <AssignmentInd />,
         link: "/customer-coupons"
         // onClick: () => history.push("/customer-coupons")
+    }, {
+        text: 'Admin Space',
+        icon: <AssignmentInd />,
+        link: "/admin-space"
+        // onClick: () => history.push("/customer-coupons")
     }
     ];
 
     return (
+
         <div className={classes.root}>
-            <CssBaseline />
-            <AppBar
-                position="fixed"
-                className={clsx(classes.appBar, {
-                    [classes.appBarShift]: open,
-                })}
-            >
-                <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                        edge="start"
-                        className={clsx(classes.menuButton, {
-                            [classes.hide]: open,
-                        })}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-
-                    <ThemeProvider theme={theme}>
-                        <Typography variant="h5" noWrap>
-                            ALBERT Coupon
-                        </Typography>
-                    </ThemeProvider>
-                </Toolbar>
-            </AppBar>
-
             <BrowserRouter>
+                <CssBaseline />
+                <AppBar
+                    position="fixed"
+                    className={clsx(classes.appBar, {
+                        [classes.appBarShift]: open,
+                    })}
+                >
+                    <Toolbar>
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={handleDrawerOpen}
+                            edge="start"
+                            className={clsx(classes.menuButton, {
+                                [classes.hide]: open,
+                            })}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+
+                        <ThemeProvider theme={theme}>
+                            <Typography variant="h5" noWrap>
+                                ALBERT Coupon
+                            </Typography>
+                        </ThemeProvider>
+
+                        <AuthMenu />
+
+                    </Toolbar>
+                </AppBar>
+
+
                 <Drawer
                     variant="permanent"
                     className={clsx(classes.drawer, {
@@ -228,7 +245,9 @@ function Layout(): JSX.Element {
 
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
-                    <Routing />
+                    <div className="mainContainer">
+                        <Routing />
+                    </div>
                 </main>
             </BrowserRouter>
         </div>

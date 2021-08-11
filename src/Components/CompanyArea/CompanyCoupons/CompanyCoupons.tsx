@@ -1,5 +1,6 @@
 import { Button, ButtonGroup, Grid, Link, Typography } from "@material-ui/core";
 import axios from "axios";
+import { count } from "console";
 import { Component } from "react";
 import { NavLink, useHistory } from "react-router-dom";
 import { Unsubscribe } from "redux";
@@ -14,6 +15,7 @@ import "./CompanyCoupons.css";
 
 interface CouponListState {
     coupons: CouponsModel[];
+    // count: number;
 }
 
 class CompanyCoupons extends Component<{}, CouponListState> {
@@ -23,25 +25,30 @@ class CompanyCoupons extends Component<{}, CouponListState> {
     public constructor(props: {}) {
         super(props);
         this.state = {
-            coupons: store.getState().couponsState.coupons
+            coupons: store.getState().couponsState.coupons,
+            // count: store.getState().couponsState.coupons.length
         };
     }
 
     public async componentDidMount() {
-        if (store.getState().couponsState.coupons.length == 0) {
-            try {
+
+        try {
+            if (this.state.coupons.length === 0) {
                 const response = await axios.get<CouponsModel[]>(globals.urls.company + "coupons");
                 // store.dispatch(catsDownloadedAction(response.data)); // updating AppState (global state)
                 store.dispatch(couponsDownloadedAction(response.data));
-                this.setState({ coupons: response.data }); // updating the local state
-                store.subscribe(() => {
-                    this.setState({ coupons: store.getState().couponsState.coupons }); // Will let us notify
-                })
-            }
-            catch (err) {
-                alert(err.message);
+                if (response.data.length !== 0) {
+                    this.setState({ coupons: response.data }); // updating the local state
+                }
             }
         }
+        catch (err) {
+            alert(err.message);
+        }
+        this.unsubscribe = store.subscribe(() => {
+            this.setState({ coupons: store.getState().couponsState.coupons }); // Will let us notify
+        })
+
     }
     public handleClick(): void {
         console.log("in handleClick");
@@ -95,10 +102,8 @@ class CompanyCoupons extends Component<{}, CouponListState> {
     }
 
     public componentWillUnmount(): void {
-        //this.unsubscribe();
-        this.unsubscribe = store.subscribe(() => {
-            this.setState({ coupons: store.getState().couponsState.coupons });
-        })
+        this.unsubscribe();
+
         console.log("exit CompanyCoupons and unsubscribe");
     }
 }

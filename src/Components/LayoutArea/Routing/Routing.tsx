@@ -1,4 +1,5 @@
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+import AdminSpace from "../../AdminArea/AdminSpace/AdminSpace";
 import Login from "../../AuthArea/Login/Login";
 import Logout from "../../AuthArea/Logout/Logout";
 import Register from "../../AuthArea/Register/Register";
@@ -22,13 +23,13 @@ function Routing(): JSX.Element {
                 <Route path="/register" component={Register} exact />
                 <Route path="/company-coupons" component={CompanyCoupons} exact />
                 <Route path="/customer-coupons" component={CustomerCoupons} exact />
+                <Route path="/admin-space" component={AdminSpace} exact />
                 <Route path="/add-coupon" component={AddCoupon} exact />
                 <Route path="/about" component={About} exact />
                 <Redirect from="/" to="/home" exact/>
                 <Route component={Page404}/> {/* Last */}
             </Switch>
         </div>
-     
     );
 }
 

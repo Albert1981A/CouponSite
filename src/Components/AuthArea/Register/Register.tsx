@@ -71,88 +71,47 @@ function Register(): JSX.Element {
                 <TextField
                     id="outlined-textarea-1"
                     type="text"
-                    name="first name"
-                    label="First Name"
-                    placeholder="First Name"
+                    name="clientName"
+                    label="Name"
+                    placeholder="Name"
                     multiline
                     variant="outlined"
-                    {...register("first", {
-                        required: { value: true, message: 'Missing First Name' },
+                    {...register("clientName", {
+                        required: { value: true, message: 'Missing Name' },
                         maxLength: { value: 10, message: 'First name is limit upto 10 Characters' }
                     })}
                 />
                 <br />
-                <span>{errors.first?.message}</span>
+                <span>{errors.clientName?.message}</span>
                 <br />
                 <TextField
                     id="outlined-textarea-2"
                     type="text"
-                    name="last name"
-                    label="Last Name"
-                    placeholder="Last Name"
-                    multiline
-                    variant="outlined"
-                    {...register("last", {
-                        required: { value: true, message: 'Missing Last Name' },
-                        maxLength: { value: 10, message: 'Last name is limit upto 10 Characters' }
-                    })}
-                />
-                <br />
-                <span>{errors.last?.message}</span>
-                <br />
-                <TextField
-                    id="outlined-textarea-3"
-                    type="text"
-                    name="email"
+                    name="clientEmail"
                     label="Email"
                     placeholder="Email"
                     multiline
                     variant="outlined"
-                    {...register("email", {
+                    {...register("clientEmail", {
                         required: { value: true, message: 'Missing Email' },
                         pattern: { value: /^\S+@\S+$/i, message: 'Invalid Email' }
                     })}
                 />
                 <br />
-                <span>{errors.email?.message}</span>
+                <span>{errors.clientEmail?.message}</span>
                 <br />
                 <TextField
-                    id="outlined-textarea-4"
-                    type="password"
-                    name="password"
-                    label="Password"
-                    placeholder="Password"
+                    id="outlined-textarea-3"
+                    type="text"
+                    name="clientType"
+                    label="Type"
+                    placeholder="Type"
                     multiline
                     variant="outlined"
-                    {...register("password", {
-                        required: { value: true, message: 'Missing Password' },
-                        minLength: { value: 4, message: 'Password should contains at least 4 Characters' },
-                        maxLength: { value: 12, message: 'Password should contains up to 12 Characters' },
+                    {...register("clientType", {
+                        required: { value: true, message: 'Missing Type' }
                     })}
                 />
-                <br />
-                <span>{errors.password?.message}</span>
-                <br />
-
-                <FormControl className={classes.formControl} {...register("type", { required: { value: true, message: 'Missing User Type' } })}>
-                    <InputLabel id="demo-controlled-open-select-label">Client Type</InputLabel>
-                    <Select
-                        labelId="client-type"
-                        id="client-type"
-                        value={type}
-                        onChange={handleChange}
-                        name="type"
-                    >
-                        <option value="">None</option>
-                        <option value="ADMINISTRATOR">Administrator</option>
-                        <option value="CUSTOMER">Customer</option>
-                        <option value="COMPANY">Company</option>
-                    </Select>
-                </FormControl>
-
-                <br />
-                <span>{errors.type?.message}</span>
-                <br />
 
                 {/* <input type="submit" disabled={!isDirty || !isValid} value="Register" /> */}
                 <Button variant="contained" type="submit" color="primary" disabled={!isDirty || !isValid} value="Register" >Register</Button>

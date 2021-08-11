@@ -17,6 +17,8 @@ import {
     KeyboardTimePicker,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
+import tokenAxios from "../../../Service/InterceptorAxios";
+import { useState } from "react";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -29,6 +31,15 @@ const useStyles = makeStyles((theme: Theme) =>
         formControl: {
             margin: theme.spacing(1),
             minWidth: 120,
+        },
+        // container: {
+        //     display: 'flex',
+        //     flexWrap: 'wrap',
+        // },
+        textField: {
+            marginLeft: theme.spacing(1),
+            marginRight: theme.spacing(1),
+            width: 200,
         },
     }),
 );
@@ -62,30 +73,36 @@ function AddCoupon(): JSX.Element {
     async function send(coupon: CouponLoadModel) {
         console.log(coupon);
         try {
-            const formData = new FormData();
-            formData.append("companyID", coupon.companyID.toString());
-            formData.append("category", coupon.category.toString());
-            formData.append("title", coupon.title);
-            formData.append("description", coupon.description);
-            formData.append("startDate", coupon.startDate.toString());
-            formData.append("endDate", coupon.endDate.toString());
-            formData.append("amount", coupon.amount.toString());
-            formData.append("price", coupon.price.toString());
-            formData.append("image", coupon.image);
-            console.log(formData);
-            const response = await axios.post<CouponModel>(globals.urls.company + "coupons", formData);
-            const added = response.data;
-            store.dispatch(couponsAddedAction(added));
+            // const formData = new FormData();
+            // formData.append("companyID", coupon.companyID.toString());
+            // formData.append("category", coupon.category.toString());
+            // formData.append("title", coupon.title);
+            // formData.append("description", coupon.description);
+            // formData.append("startDate", coupon.startDate.toString());
+            // formData.append("endDate", coupon.endDate.toString());
+            // formData.append("amount", coupon.amount.toString());
+            // formData.append("price", coupon.price.toString());
+            // formData.append("image", coupon.image);
+            // console.log(formData);
+
+            // Sending token without interceptor
+            // const headers = { "authorization": store.getState().authState.user.token };
+            // const response = await axios.post<CouponModel>(globals.urls.company + "coupons", coupon, { headers });
+
+            // Sending token with interceptor
+            // const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", coupon);
+
+            // Sending request with no token
+            const response = await axios.post<CouponModel>(globals.urls.company + "coupons", coupon);
+
+            store.dispatch(couponsAddedAction(response.data));
             notify.success(SccMsg.ADDED);
-            alert("Cat has been added");
-            history.push("/cats-2")
+            history.push("/company-coupons")
         } catch (err) {
             notify.error(err);
         }
     }
 
-    // The first commit of Material-UI
-    //'2014-08-18T21:11:54'
     const [selectedDate1, setSelectedDate1] = React.useState<Date | null>(
         new Date(),
     );
@@ -101,6 +118,14 @@ function AddCoupon(): JSX.Element {
         setSelectedDate2(date2);
     };
 
+    const [coupons, setCoupons] = useState(store.getState().couponsState.coupons);
+
+    useEffect(() => {
+        const unsubscribe = store.subscribe(() => {
+            setCoupons(store.getState().couponsState.coupons)
+            return unsubscribe;
+        })
+    });
 
     return (
         <div className="AddCoupon Box1">
@@ -194,22 +219,12 @@ function AddCoupon(): JSX.Element {
                 <br />
 
                 {/* public startDate ? : Date; */}
-                {/* <TextField
-                    id="outlined-textarea-4"
-                    type="date"
-                    name="startDate"
-                    label="Start Date"
-                    placeholder="Start Date"
-                    multiline
-                    variant="outlined"
-                    {...register("startDate", {
-                        required: { value: true, message: 'Missing start date' },
-                        // minLength: { value: 4, message: 'Password should contains at least 4 Characters' },
-                        // maxLength: { value: 12, message: 'Password should contains up to 12 Characters' },
-                    })}
-                /> */}
-                
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                {/* <input type="date" name="startDate" placeholder="Start Date" required {...register("startDate", {
+                    required: { value: true, message: 'Missing start date' },
+                    // minLength: { value: 4, message: 'Password should contains at least 4 Characters' },
+                    // maxLength: { value: 12, message: 'Password should contains up to 12 Characters' },
+                })}/> */}
+                {/* <MuiPickersUtilsProvider utils={DateFnsUtils}>
                     <Grid container justifyContent="space-around">
                         <KeyboardDatePicker
                             disableToolbar
@@ -226,26 +241,32 @@ function AddCoupon(): JSX.Element {
                             name="startDate"
                         />
                     </Grid>
-                </MuiPickersUtilsProvider>
+                </MuiPickersUtilsProvider> */}
+                <TextField
+                    id="date"
+                    label="Start Date"
+                    type="date"
+                    name="startDate"
+                    className={classes.textField}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    {...register("startDate", {
+                        required: { value: true, message: 'Missing start date' },
+                    })}
+                />
                 <br />
                 <span>{errors.startDate?.message}</span>
-                <br /> 
+                <br />
 
                 {/* public endDate ? : Date; */}
-                {/* <TextField
-                    id="outlined-textarea-5"
-                    type="date"
-                    name="endDate"
-                    label="End Date"
-                    placeholder="End Date"
-                    multiline
-                    variant="outlined"
-                    {...register("endDate", {
-                        required: { value: true, message: 'Missing end date' },
-                    })}
-                /> */}
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <Grid container justifyContent="space-around">
+                {/* <input type="date" name="startDate" placeholder="Start Date" required {...register("startDate", {
+                    required: { value: true, message: 'Missing start date' },
+                    // minLength: { value: 4, message: 'Password should contains at least 4 Characters' },
+                    // maxLength: { value: 12, message: 'Password should contains up to 12 Characters' },
+                })}/> */}
+                {/* <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <Grid container justifyContent="space-around" >
                         <KeyboardDatePicker
                             disableToolbar
                             variant="inline"
@@ -261,7 +282,20 @@ function AddCoupon(): JSX.Element {
                             name="endDate"
                         />
                     </Grid>
-                </MuiPickersUtilsProvider>
+                </MuiPickersUtilsProvider> */}
+                <TextField
+                    id="date"
+                    label="End Date"
+                    type="date"
+                    name="endDate"
+                    className={classes.textField}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    {...register("endDate", {
+                        required: { value: true, message: 'Missing start date' },
+                    })}
+                />
                 <br />
                 <span>{errors.endDate?.message}</span>
                 <br />

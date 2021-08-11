@@ -1,0 +1,18 @@
+.AuthMenu {
+	position: absolute;
+    right:40px;
+    top:20px;
+    font-size: 18px;
+}
+
+.normal {
+    color: rgb(253, 235, 70);
+    text-decoration: none;
+}
+
+.active {
+    font-weight: 600;
+    color: rgb(253, 235, 70);
+    text-transform: uppercase;
+    text-decoration: none;
+}

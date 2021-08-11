@@ -53,6 +53,8 @@ export function couponsReducer(currentState: CouponsAppState = new CouponsAppSta
         case CouponsActionType.CouponUpdated:
             // const idx = newState.coupons.filter(c => c.id === action.payload.id);
             // newState.coupons[idx] = action.payload;
+            const idx = newState.coupons.findIndex(c => c.id === action.payload.id);
+            newState.coupons[idx] = action.payload;
             break;
         case CouponsActionType.CouponDeleted:
             newState.coupons = newState.coupons.filter(c => c.id !== action.payload);
