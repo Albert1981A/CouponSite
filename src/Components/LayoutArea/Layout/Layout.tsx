@@ -18,10 +18,15 @@ import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 import clsx from "clsx";
-import { AssignmentInd, Business, ExitToApp, Home, Info, LockOpen, PersonAdd } from "@material-ui/icons";
+import { AssignmentInd, Business, ExitToApp, Home, Info, LockOpen, PermIdentity, PersonAdd } from "@material-ui/icons";
 import Routing from "../Routing/Routing";
 import { BrowserRouter, Link, NavLink, useHistory, withRouter } from "react-router-dom";
 import AuthMenu from "../../AuthArea/AuthMenu/AuthMenu";
+import Logo from "../Logo/Logo";
+import BImage from "../../../Assets/images/002.png";
+import BImage1 from "../../../Assets/images/white-b1.jpg";
+import { cyan, teal } from "@material-ui/core/colors";
+
 
 const drawerWidth = 240;
 
@@ -29,9 +34,12 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             display: 'flex',
+            // backgroundImage: `url(${BImage1})`,
+            
         },
         appBar: {
             zIndex: theme.zIndex.drawer + 1,
+            backgroundImage: `url(${BImage})`,
             transition: theme.transitions.create(['width', 'margin'], {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
@@ -91,6 +99,12 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     }),
 );
+
+const styles = {
+    paperContainer: {
+        backgroundImage: `url(${Image})`
+    }
+};
 // display: flex;
 //     flex-direction: row;
 //     justify-content: center;
@@ -123,54 +137,49 @@ function Layout(): JSX.Element {
     //const { history } = props;
     const itemList = [{
         text: 'Register',
-        icon: <PersonAdd />,
+        icon: <PersonAdd style={{ color: teal[600] }} />,
         link: "/register"
         // onClick: () => history.push("/register")
     }, {
-        text: 'addCoupon',
-        icon: <LockOpen />,
-        link: "/add-coupon"
-        //onClick: () => history.push("/login")
-    }, {
         text: 'Login',
-        icon: <LockOpen />,
+        icon: <LockOpen style={{ color: teal[600] }} />,
         link: "/login"
         //onClick: () => history.push("/login")
     }, {
         text: 'Logout',
-        icon: <ExitToApp />,
+        icon: <ExitToApp style={{ color: teal[600] }} />,
         link: "/logout"
         //onClick: () => history.push("/logout")
     }, {
         text: 'About',
-        icon: <Info />,
+        icon: <Info style={{ color: teal[600] }} />,
         link: "/about"
         //onClick: () => history.push("/about")
     }, {
         text: 'Home',
-        icon: <Home />,
+        icon: <Home style={{ color: teal[600] }} />,
         link: "/home"
         // onClick: () => history.push("/home")
     }, {
         text: 'Company Coupons',
-        icon: <Business />,
+        icon: <Business style={{ color: teal[600] }} />,
         link: "/company-coupons"
         // onClick: () => history.push("/company-coupons")
     }, {
         text: 'Customer Coupons',
-        icon: <AssignmentInd />,
+        icon: <AssignmentInd style={{ color: teal[600] }} />,
         link: "/customer-coupons"
         // onClick: () => history.push("/customer-coupons")
     }, {
         text: 'Admin Space',
-        icon: <AssignmentInd />,
+        icon: <PermIdentity style={{ color: teal[600] }} />,
         link: "/admin-space"
         // onClick: () => history.push("/customer-coupons")
     }
     ];
 
     return (
-
+        <div className="Layout">
         <div className={classes.root}>
             <BrowserRouter>
                 <CssBaseline />
@@ -195,13 +204,15 @@ function Layout(): JSX.Element {
 
                         <ThemeProvider theme={theme}>
                             <Typography variant="h5" noWrap>
-                                ALBERT Coupon
+                                {/* ALBERT Coupon */}
+                                <Logo/>
                             </Typography>
                         </ThemeProvider>
 
                         <AuthMenu />
 
                     </Toolbar>
+                    
                 </AppBar>
 
 
@@ -250,6 +261,7 @@ function Layout(): JSX.Element {
                     </div>
                 </main>
             </BrowserRouter>
+        </div>
         </div>
     )
 }

@@ -8,7 +8,6 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import CompaniesImage from "../../../Assets/images/companies.jpg";
 import { ButtonGroup } from "@material-ui/core";
 import CouponModel from "../../../Models/CouponModel";
 import CompanyModel from "../../../Models/CompanyModel";
@@ -18,6 +17,8 @@ import axios from "axios";
 import globals from "../../../Service/Globals";
 import { couponsDeletedAction } from "../../../Redux/CouponsState";
 import store from "../../../Redux/Store";
+import tokenAxios from "../../../Service/InterceptorAxios";
+import { NavLink } from "react-router-dom";
 
 interface CardProps {
     coupon: CouponModel;
@@ -33,18 +34,23 @@ const useStyles = makeStyles({
     },
 });
 
+// function handleClick(): void {
+//     <NavLink to="/coupon-details" exact />
+// }
+
+
 function CompanyCard(_props: CardProps): JSX.Element {
-    
+
     const classes = useStyles();
+    const prop1 = { ..._props.coupon }
+    const startDate = moment(prop1.startDate).format('D/M/YYYY');
+    const endDate = moment(prop1.endDate).format('D/M/YYYY');
 
-    const startDate = moment(_props.coupon.startDate).format('D/M/YYYY');
-    const endDate = moment(_props.coupon.endDate).format('D/M/YYYY');
-
-    async function deleteCat(id: number):Promise<void> { 
+    async function deleteCat(id: number): Promise<void> {
         const result = window.confirm("Are you sure you want to delete cat id - " + id + "?");
         if (result) {
             try {
-                const response = await axios.delete<any>(globals.urls.company + "coupons/" + id);
+                const response = await tokenAxios.delete<any>(globals.urls.company + "coupons/" + id);
                 store.dispatch(couponsDeletedAction(id)); // updating AppState (global state)
             } catch (err) {
                 alert(err.message);
@@ -56,40 +62,46 @@ function CompanyCard(_props: CardProps): JSX.Element {
         <div>
             <Card className={classes.root}>
 
-                <CardActionArea >
+                <NavLink className="navLink" to="/coupon-details" exact>
 
-                    <CardMedia
-                        className={classes.media}
-                        //image={_props.coupon.image}
-                        image={CompaniesImage}
-                        title="Contemplative Reptile"
-                    />
+                    <CardActionArea>
+
+                        <CardMedia
+                            className={classes.media}
+                            image={`${process.env.PUBLIC_URL}/assets/images/` + _props.coupon.image}
+                            title="Contemplative Reptile"
+                        />
 
 
-                    <CardContent>
-                        <Typography gutterBottom variant="h6" component="h2">
-                            Company ID: {_props.coupon.companyID} <br />
-                            {_props.coupon.title}
-                        </Typography>
+                        <CardContent>
+                            <Typography gutterBottom variant="h6" component="h2">
+                                Company ID: {prop1.companyID} <br />
+                                {prop1.title}
+                            </Typography>
 
-                        <Typography variant="body2" color="textSecondary" component="p">
-                        Category: &nbsp; {_props.coupon.category} <br />
-                            Description: &nbsp; {_props.coupon.description} <br />
-                            Amount: &nbsp; {_props.coupon.amount} <br />
-                            Start-Date: &nbsp; {startDate} <br />
-                            End-Date: &nbsp; {endDate} <br />
-                            Price: &nbsp; {_props.coupon.price}
-                        </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                Coupon Id:  &nbsp; {prop1.id} <br />
+                                Category: <br /> {prop1.category} <br />
+                                Description: &nbsp; {prop1.description} <br />
+                                Amount: &nbsp; {prop1.amount} <br />
+                                Start-Date: &nbsp; {startDate} <br />
+                                End-Date: &nbsp; {endDate} <br />
+                                Price: &nbsp; {prop1.price}
+                            </Typography>
 
-                    </CardContent>
+                        </CardContent>
 
-                </CardActionArea>
+                    </CardActionArea>
+
+                </NavLink>
 
                 <CardActions>
                     <p>Operations:</p>
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
-                        <Button>Update</Button>
-                        <Button onClick={() => deleteCat(_props.coupon.id)}>Delete</Button>
+                    <NavLink className="link" to="/update-company-coupon">
+                        <Button color="primary">Update</Button>
+                        </NavLink>
+                        <Button onClick={() => deleteCat(prop1.id)}>Delete</Button>
                     </ButtonGroup>
                 </CardActions>
 

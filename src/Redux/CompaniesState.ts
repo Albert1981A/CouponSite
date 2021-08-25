@@ -3,6 +3,7 @@ import CompanyModel from "../Models/CompanyModel";
 // Step 1 - Create AppState and manage the collection once and in a centralize place
 export class CompaniesAppState {
     public companies: CompanyModel[] = [];
+    company: any;
 }
 
 // Step 2 - Define ActionType using enum for all required operations

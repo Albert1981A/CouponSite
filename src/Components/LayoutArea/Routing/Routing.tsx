@@ -4,7 +4,9 @@ import Login from "../../AuthArea/Login/Login";
 import Logout from "../../AuthArea/Logout/Logout";
 import Register from "../../AuthArea/Register/Register";
 import CompanyCoupons from "../../CompanyArea/CompanyCoupons/CompanyCoupons";
+import UpdateCompanyCoupon from "../../CompanyArea/UpdateCompanyCoupon/UpdateCompanyCoupon";
 import AddCoupon from "../../CouponArea/AddCoupon/AddCoupon";
+import CouponDetails from "../../CouponArea/CouponDetails/CouponDetails";
 import CustomerCoupons from "../../CustomerArea/CustomerCoupons/CustomerCoupons";
 import About from "../../MenuArea/About/About";
 import Page404 from "../../SharedArea/Page404/Page404";
@@ -21,7 +23,9 @@ function Routing(): JSX.Element {
                 <Route path="/login" component={Login} exact />
                 <Route path="/logout" component={Logout} exact />
                 <Route path="/register" component={Register} exact />
+                <Route path="/coupon-details" component={CouponDetails} exact />
                 <Route path="/company-coupons" component={CompanyCoupons} exact />
+                <Route path="/update-company-coupon" component={UpdateCompanyCoupon} exact />
                 <Route path="/customer-coupons" component={CustomerCoupons} exact />
                 <Route path="/admin-space" component={AdminSpace} exact />
                 <Route path="/add-coupon" component={AddCoupon} exact />

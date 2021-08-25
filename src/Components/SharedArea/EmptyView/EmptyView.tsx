@@ -1,3 +1,4 @@
+import { Box, Typography } from "@material-ui/core";
 import { Component } from "react";
 import "./EmptyView.css";
 
@@ -14,8 +15,16 @@ class EmptyView extends Component<viewProps> {
     public render(): JSX.Element {
         return (
             <div className="EmptyView">
-				<h2>Empty view!</h2>
-                <span>{this.props.msg}</span>
+                <br />
+                <Typography className="EM1" variant="h5" noWrap>
+                    <Box fontWeight="fontWeightMedium">
+                    &nbsp; &nbsp; Empty view!
+                        </Box>
+                </Typography>
+                <Typography className="EM2">
+                        <span>&nbsp; &nbsp; &nbsp; {this.props.msg}</span>
+                </Typography>
+                <br />
             </div>
         );
     }

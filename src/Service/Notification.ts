@@ -1,5 +1,6 @@
 import { Notyf } from 'notyf'
 
+
 export enum SccMsg {
     ADDED = 'Added successfully!',
     DOWNLOADED = 'Downloaded successfully!',
@@ -7,10 +8,12 @@ export enum SccMsg {
     LOGIN_SUCCESS = "LOGIN_SUCCESS",
     LOGOUT_SUCCESS = "LOGOUT_SUCCESS",
     // Must be last
-    REGISTER_SUCCESS = "REGISTER_SUCCESS"
+    REGISTER_SUCCESS = "REGISTER_SUCCESS",
+    UPDATE_COUPON = "UPDATE_COUPON"
 }
 export enum ErrMsg {
-    PLS_LOGIN
+    PLS_LOGIN,
+    UPDATE_COUPON
 }
 
 class Notify {

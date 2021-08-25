@@ -11,6 +11,8 @@ import tokenAxios from "../../../Service/InterceptorAxios";
 import notify, { SccMsg } from "../../../Service/Notification";
 import "./Login.css";
 
+
+
 function Login(): JSX.Element {
 
     const [user, setUser] = useState(store.getState().authState.user);
@@ -24,11 +26,13 @@ function Login(): JSX.Element {
             const response = await axios.post<UserModel>(globals.urls.client + "login", credentials);
             console.log(response.data);
             store.dispatch(loginAction(response.data));
-            setUser(store.getState().authState.user);
+            // setUser(store.getState().authState.user);
+
+
             console.log("user:" + user);
 
             notify.success(SccMsg.LOGIN_SUCCESS);
-            const clientType = store.getState().authState.user.clientType;
+            const clientType = store.getState().authState.user.clientType
             console.log(clientType);
 
             // switch(clientType.clientType){
@@ -66,6 +70,7 @@ useEffect(() => {
         setUser(store.getState().authState.user)
         return unsubscribe;
     })
+    
 });
 
 return (

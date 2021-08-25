@@ -1,5 +1,8 @@
-/* .Register {
+.Register {
 	align-items: center;
+    background-color: aliceblue;
+    color: #00897b;
+    border-color: #00897b;
 }
 
 .Register span{
@@ -17,7 +20,7 @@
 .Register button{
     
     margin: 10px 0;
-    width: 100%;
+    width: 70%;
 
 
 }
@@ -25,4 +28,4 @@
 .Register > form{
     text-align: left;
     align-items: flex-start;
-} */
+}

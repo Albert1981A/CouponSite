@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Grid, Link, Typography } from "@material-ui/core";
+import { Box, Button, ButtonGroup, Grid, Link, ThemeProvider, Typography, useTheme } from "@material-ui/core";
 import axios from "axios";
 import { count } from "console";
 import { Component } from "react";
@@ -9,6 +9,7 @@ import { companiesDownloadedAction } from "../../../Redux/CompaniesState";
 import { couponsDownloadedAction } from "../../../Redux/CouponsState";
 import store from "../../../Redux/Store";
 import globals from "../../../Service/Globals";
+import tokenAxios from "../../../Service/InterceptorAxios";
 import EmptyView from "../../SharedArea/EmptyView/EmptyView";
 import CompanyCard from "../CompanyCard/CompanyCard";
 import "./CompanyCoupons.css";
@@ -31,10 +32,9 @@ class CompanyCoupons extends Component<{}, CouponListState> {
     }
 
     public async componentDidMount() {
-
         try {
             if (this.state.coupons.length === 0) {
-                const response = await axios.get<CouponsModel[]>(globals.urls.company + "coupons");
+                const response = await tokenAxios.get<CouponsModel[]>(globals.urls.company + "coupons");
                 // store.dispatch(catsDownloadedAction(response.data)); // updating AppState (global state)
                 store.dispatch(couponsDownloadedAction(response.data));
                 if (response.data.length !== 0) {
@@ -48,36 +48,42 @@ class CompanyCoupons extends Component<{}, CouponListState> {
         this.unsubscribe = store.subscribe(() => {
             this.setState({ coupons: store.getState().couponsState.coupons }); // Will let us notify
         })
-
     }
+
     public handleClick(): void {
         console.log("in handleClick");
         <NavLink to="/add-coupon" exact />
     }
 
     public render(): JSX.Element {
+
+
         return (
             <div className="CompanyCoupons">
+                
+                <div className="head2">
+                    {/* <h2 className="head">Company Coupons &nbsp; &nbsp;</h2> */}
+                    <Typography variant="h5" noWrap>
+                        <Box className="head1" fontWeight="fontWeightMedium">Company Coupons &nbsp; &nbsp;</Box>
+                    </Typography>
 
-                <h2 className="head">Company Coupons &nbsp; &nbsp;</h2>
-
-                <div className="topButtonsGroup">
-
-                    <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
-                        <NavLink className="link" to="/add-coupon">
-                            <Button color="primary">
-                                Add Coupon
-                            </Button>
-                        </NavLink>
-                        <NavLink className="link" to="/add-coupon">
-                            <Button color="primary">
-                                Coupon list
-                            </Button>
-                        </NavLink>
-                    </ButtonGroup>
+                    <div className="topButtonsGroup">
+                        <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
+                            <NavLink className="link" to="/add-coupon">
+                                <Button color="primary">
+                                    Add Coupon
+                                </Button>
+                            </NavLink>
+                            <NavLink className="link" to="/add-coupon">
+                                <Button color="primary">
+                                    Coupon list
+                                </Button>
+                            </NavLink>
+                        </ButtonGroup>
+                    </div>
                 </div>
 
-                <br /><br />
+                <br />
 
                 <Typography paragraph>
                     This section shows all the company's coupons.
@@ -102,7 +108,10 @@ class CompanyCoupons extends Component<{}, CouponListState> {
     }
 
     public componentWillUnmount(): void {
-        this.unsubscribe();
+        // this.unsubscribe();
+        this.unsubscribe = store.subscribe(() => {
+            this.setState({ coupons: store.getState().couponsState.coupons }); // Will let us notify
+        })
 
         console.log("exit CompanyCoupons and unsubscribe");
     }

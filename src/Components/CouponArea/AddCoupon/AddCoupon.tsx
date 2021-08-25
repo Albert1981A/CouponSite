@@ -93,7 +93,7 @@ function AddCoupon(): JSX.Element {
             // const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", coupon);
 
             // Sending request with no token
-            const response = await axios.post<CouponModel>(globals.urls.company + "coupons", coupon);
+            const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", coupon);
 
             store.dispatch(couponsAddedAction(response.data));
             notify.success(SccMsg.ADDED);
