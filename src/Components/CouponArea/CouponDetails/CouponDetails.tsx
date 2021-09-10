@@ -28,11 +28,11 @@ const useStyles = makeStyles({
 function CouponDetails(props: CouponDetailsProps): JSX.Element {
 
     const params = useParams<RouteParams>();
-    console.log("first: " + params.id);
+    // console.log("first: " + params.id);
     const id = + props.match.params.id
-    console.log("second: " +id);
+    // console.log("second: " + id);
     const history = useHistory();
-    
+
     useEffect(() => {
         if (!store.getState().authState.user) {
             notify.error(ErrMsg.PLS_LOGIN);
@@ -40,16 +40,14 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
         }
     })
 
-    console.log(id);
-    const [coupon, setCompany] = useState(
+    // console.log(id);
+    const [coupon, setCoupon] = useState(
         store.getState().couponsState.coupons.find((c) => c.id === id)
     );
 
-    
-
     const classes = useStyles();
-    console.log("start Date: " + coupon.startDate);
-    console.log("start Date: " + moment(coupon.startDate).format('D/M/YYYY'));
+    // console.log("start Date: " + coupon.startDate);
+    // console.log("start Date: " + moment(coupon.startDate).format('D/M/YYYY'));
     const startDate = moment(coupon.startDate).format('D/M/YYYY');
     const endDate = moment(coupon.endDate).format('D/M/YYYY');
     const clientType = store.getState().authState.user.clientType;
@@ -68,14 +66,16 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
             try {
                 const response = await tokenAxios.delete<any>(globals.urls.company + "coupons/" + id);
                 store.dispatch(couponsDeletedAction(id)); // updating AppState (global state)
+                history.push("/company-coupons");
             } catch (err) {
-                alert(err.message);
+                // alert(err.message);
+                notify.error(ErrMsg.ERROR_OCCURRED_WHILE_DELETING_COUPON);
+                notify.error(err);
             }
         }
     }
 
     console.log(coupon);
-
 
     return (
         <div className="CouponDetails">
@@ -91,7 +91,7 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
 
 
                     <CardContent>
-                        <Typography gutterBottom variant="h6" component="h2">
+                        <Typography className="Typography1" gutterBottom variant="h6" component="h2">
                             Company ID: {coupon.companyID} <br />
                             {coupon.title}
                         </Typography>
@@ -100,8 +100,8 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
                             Category: <br /> {coupon.category} <br />
                             Description: &nbsp; {coupon.description} <br />
                             Amount: &nbsp; {coupon.amount} <br />
-                            Start-Date: &nbsp; {coupon.startDate} <br />
-                            End-Date: &nbsp; {coupon.endDate} <br />
+                            Start-Date: &nbsp; {startDate} <br />
+                            End-Date: &nbsp; {endDate} <br />
                             Price: &nbsp; {coupon.price}
                         </Typography>
 
@@ -113,13 +113,15 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
                     <p>Operations:</p>
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
-                        <NavLink className="link" to={routeTo}>
-                            <Button color="primary">
+                        <Button color="primary">
+                            <NavLink className="linkTo" to={routeTo}>
                                 Go Back
-                            </Button>
-                        </NavLink>
+                            </NavLink>
+                        </Button>
 
-                        <Button onClick={() => deleteCoupon(coupon.id)}>Delete</Button>
+                        {store.getState().authState.user.clientType === 'COMPANY' &&
+                            <Button onClick={() => deleteCoupon(coupon.id)}>Delete</Button>
+                        }
                     </ButtonGroup>
                 </CardActions>
 

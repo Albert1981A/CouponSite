@@ -51,6 +51,7 @@ function AddCoupon(): JSX.Element {
 
     const [type, setType] = React.useState<string | string>('');
     const [open, setOpen] = React.useState(false);
+    const [user, setUser] = React.useState(store.getState().authState.user)
 
     const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         setType(event.target.value as string);
@@ -59,16 +60,7 @@ function AddCoupon(): JSX.Element {
     const theme = useTheme();
 
     const { register, handleSubmit, formState: { errors, isDirty, isValid } } = useForm<CouponLoadModel>({ mode: "onTouched" });
-    const history = useHistory(); //Redirect function
-
-    // useEffect(() => {
-    //     // if we don't have a user object - we are not logged in and we are not allowed in.
-    //     if (!store.getState().authState.user) {
-    //         // notify.error(ErrMsg.PLS_LOGIN);
-    //         notify.error("you need to login first");
-    //         history.push("/login");
-    //     }
-    // });
+    const history = useHistory(); 
 
     async function send(coupon: CouponLoadModel) {
         console.log(coupon);
@@ -94,8 +86,9 @@ function AddCoupon(): JSX.Element {
 
             // Sending request with no token
             const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", coupon);
-
-            store.dispatch(couponsAddedAction(response.data));
+            const added = response.data;
+            console.log(added);
+            store.dispatch(couponsAddedAction(added));
             notify.success(SccMsg.ADDED);
             history.push("/company-coupons")
         } catch (err) {
@@ -121,6 +114,10 @@ function AddCoupon(): JSX.Element {
     const [coupons, setCoupons] = useState(store.getState().couponsState.coupons);
 
     useEffect(() => {
+        if (!store.getState().authState.user) {
+            notify.error(ErrMsg.PLS_LOGIN);
+            history.push("/login");
+        }
         const unsubscribe = store.subscribe(() => {
             setCoupons(store.getState().couponsState.coupons)
             return unsubscribe;
@@ -148,6 +145,7 @@ function AddCoupon(): JSX.Element {
                     placeholder="Company ID"
                     multiline
                     variant="outlined"
+                    value={user.clientId}
                     {...register("companyID", {
                         required: { value: true, message: 'Missing company id' }
                     })}
@@ -193,7 +191,8 @@ function AddCoupon(): JSX.Element {
                     variant="outlined"
                     {...register("title", {
                         required: { value: true, message: 'Missing title' },
-                        maxLength: { value: 40, message: 'Last name is limit upto 40 Characters' }
+                        maxLength: { value: 40, message: 'Title is limit upto 40 Characters!' },
+                        minLength: { value: 2, message: 'Minimum length of 2 Characters!' }
                     })}
                 />
                 <br />
@@ -210,7 +209,9 @@ function AddCoupon(): JSX.Element {
                     multiline
                     variant="outlined"
                     {...register("description", {
-                        required: { value: true, message: 'Missing description' }
+                        required: { value: true, message: 'Missing description!' },
+                        maxLength: { value: 400, message: 'Title is limit upto 400 Characters!' },
+                        minLength: { value: 2, message: 'Minimum length of 2 Characters!' }
                         // ,pattern: { value: /^\S+@\S+$/i, message: 'Invalid Email' }
                     })}
                 />
@@ -252,7 +253,7 @@ function AddCoupon(): JSX.Element {
                         shrink: true,
                     }}
                     {...register("startDate", {
-                        required: { value: true, message: 'Missing start date' },
+                        required: { value: true, message: 'Missing start date!' },
                     })}
                 />
                 <br />
@@ -293,7 +294,7 @@ function AddCoupon(): JSX.Element {
                         shrink: true,
                     }}
                     {...register("endDate", {
-                        required: { value: true, message: 'Missing start date' },
+                        required: { value: true, message: 'Missing end date!' },
                     })}
                 />
                 <br />
@@ -310,7 +311,8 @@ function AddCoupon(): JSX.Element {
                     multiline
                     variant="outlined"
                     {...register("amount", {
-                        required: { value: true, message: 'Missing amount' }
+                        required: { value: true, message: 'Missing amount!' },
+                        min: { value: 1, message: "Weight must be grater than zero!" }
                     })}
                 />
                 <br />
@@ -328,8 +330,8 @@ function AddCoupon(): JSX.Element {
                     multiline
                     variant="outlined"
                     {...register("price", {
-                        required: { value: true, message: 'Missing price' },
-                        min: { value: 0, message: "Weight must be grater than zero" }
+                        required: { value: true, message: 'Missing price!' },
+                        min: { value: 1, message: "Weight must be grater than zero!" }
                     })}
                 />
                 <br />
@@ -345,9 +347,10 @@ function AddCoupon(): JSX.Element {
                     placeholder="Image"
                     multiline
                     variant="outlined"
+                    value={user.clientName + ".jpg"}
                     {...register("image", {
-                        required: { value: true, message: 'Missing image' },
-                        min: { value: 0, message: "Weight must be grater than zero" }
+                        required: { value: true, message: 'Missing image!' },
+                        minLength: { value: 2, message: 'Minimum length of 2 Characters!' }
                     })}
                 />
                 <br />
@@ -357,6 +360,7 @@ function AddCoupon(): JSX.Element {
                 {/* <input type="submit" disabled={!isDirty || !isValid} value="Register" /> */}
                 <Button variant="contained" type="submit" color="primary" value="Register" >Register</Button>
                 <br />
+
             </form>
 
         </div>

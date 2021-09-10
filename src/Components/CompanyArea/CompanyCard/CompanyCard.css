@@ -1,4 +1,10 @@
 .navLink {
     text-decoration: none;
+    color: #00897b;
+}
+
+.link {
+    text-decoration: none;
+    color: rgb(49, 84, 153);
 }
 

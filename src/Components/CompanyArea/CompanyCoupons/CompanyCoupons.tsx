@@ -1,7 +1,7 @@
-import { Box, Button, ButtonGroup, Grid, Link, ThemeProvider, Typography, useTheme } from "@material-ui/core";
+import { Box, Button, ButtonGroup, Grid, Link, ThemeProvider, Typography, unsupportedProp, useTheme } from "@material-ui/core";
 import axios from "axios";
 import { count } from "console";
-import { Component } from "react";
+import { Component, useEffect, useRef, useState } from "react";
 import { NavLink, useHistory } from "react-router-dom";
 import { Unsubscribe } from "redux";
 import CouponsModel from "../../../Models/CouponModel";
@@ -10,111 +10,113 @@ import { couponsDownloadedAction } from "../../../Redux/CouponsState";
 import store from "../../../Redux/Store";
 import globals from "../../../Service/Globals";
 import tokenAxios from "../../../Service/InterceptorAxios";
+import notify, { ErrMsg } from "../../../Service/Notification";
 import EmptyView from "../../SharedArea/EmptyView/EmptyView";
 import CompanyCard from "../CompanyCard/CompanyCard";
 import "./CompanyCoupons.css";
 
-interface CouponListState {
-    coupons: CouponsModel[];
-    // count: number;
-}
+function CompanyCoupons(props: {}): JSX.Element {
 
-class CompanyCoupons extends Component<{}, CouponListState> {
+    let unsubscribe: Unsubscribe;
+    const history = useHistory();
 
-    private unsubscribe: Unsubscribe;
+    const [coupons, setCoupons] = useState(
+        store.getState().couponsState.coupons
+    );
 
-    public constructor(props: {}) {
-        super(props);
-        this.state = {
-            coupons: store.getState().couponsState.coupons,
-            // count: store.getState().couponsState.coupons.length
-        };
-    }
-
-    public async componentDidMount() {
-        try {
-            if (this.state.coupons.length === 0) {
-                const response = await tokenAxios.get<CouponsModel[]>(globals.urls.company + "coupons");
-                // store.dispatch(catsDownloadedAction(response.data)); // updating AppState (global state)
-                store.dispatch(couponsDownloadedAction(response.data));
-                if (response.data.length !== 0) {
-                    this.setState({ coupons: response.data }); // updating the local state
+    useEffect(() => {
+        if (!store.getState().authState.user) {
+            notify.error(ErrMsg.PLS_LOGIN);
+            history.push("/login");
+        } else if (store.getState().authState.user.clientType !== "COMPANY") {
+            notify.error(ErrMsg.ONLY_COMPANY_ALLOWED);
+            history.push("/home");
+        } else {
+            asyncFunction();
+            console.log("Hi... Im here 4");
+        }
+        async function asyncFunction() {
+            if (coupons.length === 0) {
+                try {
+                    console.log("Hi... Im here 1");
+                    const response = await tokenAxios.get<CouponsModel[]>(globals.urls.company + "coupons");
+                    if (response.data.length !== 0) {
+                        store.dispatch(couponsDownloadedAction(response.data)); // updating AppState (global state)
+                        setCoupons(store.getState().couponsState.coupons); // updating the local state
+                        console.log("Hi... Im here 2");
+                    }
+                } catch (err) {
+                    // alert(err.message);
+                    notify.error(ErrMsg.ERROR_OCCURRED_WHILE_GETTING_COUPONS);
+                    notify.error(err);
                 }
             }
         }
-        catch (err) {
-            alert(err.message);
-        }
-        this.unsubscribe = store.subscribe(() => {
-            this.setState({ coupons: store.getState().couponsState.coupons }); // Will let us notify
+
+        unsubscribe = store.subscribe(() => {
+            setCoupons(store.getState().couponsState.coupons); // Will let us notify
         })
+
+        return () => {
+            unsubscribe();
+            console.log('Bye');
+        };
+    });
+
+    function handleClick1(): void {
+        history.push("/add-coupon");
     }
 
-    public handleClick(): void {
-        console.log("in handleClick");
-        <NavLink to="/add-coupon" exact />
+    function handleClick2(): void {
+        history.push("/coupon-list");
     }
 
-    public render(): JSX.Element {
+    return (
+        <div className="CompanyCoupons">
 
-
-        return (
-            <div className="CompanyCoupons">
-                
-                <div className="head2">
-                    {/* <h2 className="head">Company Coupons &nbsp; &nbsp;</h2> */}
-                    <Typography variant="h5" noWrap>
-                        <Box className="head1" fontWeight="fontWeightMedium">Company Coupons &nbsp; &nbsp;</Box>
-                    </Typography>
-
-                    <div className="topButtonsGroup">
-                        <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
-                            <NavLink className="link" to="/add-coupon">
-                                <Button color="primary">
-                                    Add Coupon
-                                </Button>
-                            </NavLink>
-                            <NavLink className="link" to="/add-coupon">
-                                <Button color="primary">
-                                    Coupon list
-                                </Button>
-                            </NavLink>
-                        </ButtonGroup>
-                    </div>
-                </div>
-
-                <br />
-
-                <Typography paragraph>
-                    This section shows all the company's coupons.
-                    You can add and remove coupons and you can also update the existing coupons.
-                    Please note that a coupon with the same title to an existing coupon should not be added.
-                    If an existing coupon is updated, it is not possible to update the coupon code. Also, you cannot updated the company code.
+            <div className="head2">
+                <Typography variant="h5" noWrap>
+                    <Box className="head1" fontWeight="fontWeightMedium">Company Coupons &nbsp; &nbsp;</Box>
                 </Typography>
 
-                <div className="cards Box">
-                    <Grid container spacing={4}>
-                        {this.state.coupons.length === 0 && <EmptyView msg="No Coupon downloaded!" />}
-                        {this.state.coupons.length !== 0 && this.state.coupons.map(c =>
-                            <Grid item key={c.id} xs={12} sm={6} md={4}>
-                                <CompanyCard key={c.id} coupon={c} />
-                            </Grid>
-                        )}
-                    </Grid>
+                <div className="topButtonsGroup">
+                    <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
+
+                        <Button color="primary" onClick={handleClick1}>
+                            Add Coupon
+                        </Button>
+
+                        <Button color="primary" onClick={handleClick2}>
+                            Coupon list
+                        </Button>
+
+                    </ButtonGroup>
                 </div>
-
             </div>
-        );
-    }
 
-    public componentWillUnmount(): void {
-        // this.unsubscribe();
-        this.unsubscribe = store.subscribe(() => {
-            this.setState({ coupons: store.getState().couponsState.coupons }); // Will let us notify
-        })
+            <br />
 
-        console.log("exit CompanyCoupons and unsubscribe");
-    }
+            <Typography paragraph>
+                This section shows all the company's coupons.
+                You can add and remove coupons and you can also update the existing coupons.
+                Please note that a coupon with the same title to an existing coupon should not be added.
+                If an existing coupon is updated, it is not possible to update the coupon code. Also, you cannot updated the company code.
+            </Typography>
+
+            <div className="cards Box">
+                <Grid container spacing={4}>
+                    {coupons.length === 0 && <EmptyView msg="No Coupon downloaded!" />}
+                    {coupons.length !== 0 && coupons.map(c =>
+                        <Grid item key={c.id} xs={12} sm={6} md={4}>
+                            <CompanyCard key={c.id} coupon={c} />
+                        </Grid>
+                    )}
+                </Grid>
+            </div>
+
+        </div>
+    );
 }
 
 export default CompanyCoupons;
+
