@@ -4,3 +4,27 @@
     color: #00897b;
     border-color: #00897b;
 }
+
+.UpdateCompanyCoupon label{
+    font-size: 18px;
+    color:#00897b;
+}
+
+.errorMessage{
+    color:red;
+}
+
+.UpdateCompanyCoupon input{    
+    width: 250px;
+    height: 30px;
+}
+
+.UpdateCompanyCoupon select{    
+    width: 250px;
+    height: 30px;
+}
+
+.UpdateCompanyCoupon > form{
+    text-align: center;
+    align-items: flex-start;
+}

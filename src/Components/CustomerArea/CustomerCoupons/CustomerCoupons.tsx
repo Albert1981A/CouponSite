@@ -26,7 +26,7 @@ function CustomerCoupons(props: {}): JSX.Element {
             notify.error(ErrMsg.PLS_LOGIN);
             history.push("/login");
         } else if (store.getState().authState.user.clientType !== "CUSTOMER") {
-            notify.error(ErrMsg.ONLY_COMPANY_ALLOWED);
+            notify.error(ErrMsg.ONLY_CUSTOMER_ALLOWED);
             history.push("/home");
         } else {
             asyncFunction();
@@ -44,7 +44,7 @@ function CustomerCoupons(props: {}): JSX.Element {
                     }
                 } catch (err) {
                     // alert(err.message);
-                    notify.error(ErrMsg.ERROR_OCCURRED_WHILE_GETTING_COUPONS);
+                    notify.error(ErrMsg.ERROR_GETTING_COUPONS);
                     notify.error(err);
                 }
             }

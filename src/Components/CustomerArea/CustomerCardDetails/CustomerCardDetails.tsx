@@ -62,13 +62,21 @@ function CustomerCardDetails(props: CustomerCardDetailsProps): JSX.Element {
             try {
                 const response = await tokenAxios.delete<any>(globals.urls.admin + "customers/" + id);
                 store.dispatch(customersDeletedAction(id)); // updating AppState (global state)
-                history.push(routeTo);
+                history.push("/admin-customers");
             } catch (err) {
                 // alert(err.message);
-                notify.error(ErrMsg.ERROR_OCCURRED_WHILE_DELETING_CUSTOMER);
+                notify.error(ErrMsg.ERROR_DELETING_CUSTOMER);
                 notify.error(err);
             }
         }
+    }
+
+    function goBack() {
+        history.goBack();
+    }
+
+    function goToUpdate() {
+        history.push("/update-customer-details/" + customer.id);
     }
 
     return (
@@ -88,13 +96,13 @@ function CustomerCardDetails(props: CustomerCardDetailsProps): JSX.Element {
 
                     <CardContent>
                         <Typography gutterBottom variant="h6" component="h2">
-                            Customer ID: {customer.id}
+                            ID: {customer.id}
                         </Typography>
 
                         <Typography variant="body2" color="textSecondary" component="p">
-                            Customer first name: {customer.firstName}
-                            Customer last name: {customer.lastName}
-                            Customer email:  &nbsp; {customer.email}
+                            First name: {customer.firstName} <br />
+                            Last name: {customer.lastName} <br />
+                            Email:  &nbsp; {customer.email}
                         </Typography>
 
                     </CardContent>
@@ -104,22 +112,27 @@ function CustomerCardDetails(props: CustomerCardDetailsProps): JSX.Element {
                 {/* </NavLink> */}
 
                 <CardActions>
-                    <p>Operations:</p>
+                    <p>Operations:</p> <br />
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
-                        <Button color="primary">
-                            <NavLink className="link" to={routeTo}>
+                        <Button color="primary" onClick={goBack}>
+                            {/* <NavLink className="link" to={routeTo}>
                                 Go Back
-                            </NavLink>
+                            </NavLink> */}
+                            Back
                         </Button>
 
-                        <Button color="primary">
-                            <NavLink className="link" to={"/update-customer-details/" + customer.id}>
-                                Update Customer
-                            </NavLink>
+                        <Button color="primary" onClick={goToUpdate}>
+                            {/* <NavLink className="link" to={"/update-customer-details/" + customer.id}>
+                                Update
+                            </NavLink> */}
+                            Update
                         </Button>
 
-                        <Button onClick={() => deleteCustomer(customer.id)}>Delete Customer</Button>
+                        <Button onClick={() => deleteCustomer(customer.id)}>
+                            Delete
+                        </Button>
+
                     </ButtonGroup>
                 </CardActions>
 

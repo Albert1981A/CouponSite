@@ -2,6 +2,7 @@ import { Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, Ca
 import moment from "moment";
 import { Component, useEffect, useState } from "react";
 import { NavLink, RouteComponentProps, useHistory, useParams } from "react-router-dom";
+import { Unsubscribe } from "redux";
 import CouponModel from "../../../Models/CouponModel";
 import { couponsDeletedAction } from "../../../Redux/CouponsState";
 import store from "../../../Redux/Store";
@@ -27,38 +28,70 @@ const useStyles = makeStyles({
 
 function CouponDetails(props: CouponDetailsProps): JSX.Element {
 
+    const classes = useStyles();
     const params = useParams<RouteParams>();
-    // console.log("first: " + params.id);
+    console.log("first: " + params.id);
     const id = + props.match.params.id
-    // console.log("second: " + id);
+    console.log("second: " + id);
     const history = useHistory();
 
-    useEffect(() => {
-        if (!store.getState().authState.user) {
-            notify.error(ErrMsg.PLS_LOGIN);
-            history.push("/login")
-        }
-    })
+    let routeTo: string = null;
+    if (store.getState().authState.user?.clientType === "COMPANY") {
+        routeTo = "/company-coupons";
+    } else if (store.getState().authState.user?.clientType === "CUSTOMER") {
+        routeTo = "/customer-coupons";
+    } 
 
-    // console.log(id);
+    if (!store.getState().authState.user) {
+        notify.error(ErrMsg.PLS_LOGIN);
+        history.push("/login")
+    }
+
     const [coupon, setCoupon] = useState(
         store.getState().couponsState.coupons.find((c) => c.id === id)
     );
 
-    const classes = useStyles();
+    const [ofAllCoupon, setOfAllCoupon] = useState(
+        store.getState().couponsState.allCoupons.find((c) => c.id === id)
+    );
+
+    useEffect(() => {
+        if (store.getState().authState.user?.clientType === "CUSTOMER") {
+            setOfAllCoupon(store.getState().couponsState.allCoupons.find((c) => c.id === id));
+        } else if (store.getState().authState.user) {
+            setCoupon(store.getState().couponsState.coupons.find((c) => c.id === id));
+        }
+
+        let subscription: Unsubscribe;
+        let subscription2: Unsubscribe;
+
+        subscription = store.subscribe(() => {
+            setOfAllCoupon(store.getState().couponsState.allCoupons.find((c) => c.id === id));
+        });
+
+        subscription2 = store.subscribe(() => {
+            setCoupon(store.getState().couponsState.coupons.find((c) => c.id === id));
+        });
+
+        return () => {
+            function unsubscribe() {
+                subscription = store.subscribe(() => {
+                    setOfAllCoupon(store.getState().couponsState.allCoupons.find((c) => c.id === id));
+                });
+
+                subscription2 = store.subscribe(() => {
+                    setCoupon(store.getState().couponsState.coupons.find((c) => c.id === id));
+                });
+            }
+            unsubscribe();
+        };
+    })
+
     // console.log("start Date: " + coupon.startDate);
     // console.log("start Date: " + moment(coupon.startDate).format('D/M/YYYY'));
-    const startDate = moment(coupon.startDate).format('D/M/YYYY');
-    const endDate = moment(coupon.endDate).format('D/M/YYYY');
-    const clientType = store.getState().authState.user.clientType;
+    // const startDate = moment(coupon.startDate).format('D/M/YYYY');
+    // const endDate = moment(coupon.endDate).format('D/M/YYYY');
 
-    let routeTo: string = null;
-
-    if (clientType === "COMPANY") {
-        routeTo = "/company-coupons";
-    } else if (clientType === "CUSTOMER") {
-        routeTo = "/customer-coupons";
-    }
 
     async function deleteCoupon(id: number): Promise<void> {
         const result = window.confirm("Are you sure you want to delete cat id - " + id + "?");
@@ -69,7 +102,7 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
                 history.push("/company-coupons");
             } catch (err) {
                 // alert(err.message);
-                notify.error(ErrMsg.ERROR_OCCURRED_WHILE_DELETING_COUPON);
+                notify.error(ErrMsg.ERROR_DELETING_COUPON);
                 notify.error(err);
             }
         }
@@ -77,60 +110,120 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
 
     console.log(coupon);
 
+    function purchaseCoupon(id: number): void {
+        if (store.getState().authState.user.clientType === "CUSTOMER") {
+            history.push("/purchase-coupon/" + id);
+        } else {
+            notify.error(ErrMsg.ONLY_CUSTOMER_ALLOWED);
+        }
+    }
+
+    function yourSpace() {
+        history.push(routeTo);
+    }
+
+    function toMain() {
+        history.push("/home");
+    }
+
     return (
         <div className="CouponDetails">
             <Card className={classes.root}>
 
-                <CardActionArea>
+                {store.getState().authState.user &&
+                    <CardActionArea>
 
-                    <CardMedia
-                        className={classes.media}
-                        image={`${process.env.PUBLIC_URL}/assets/images/` + coupon.image}
-                        title="Contemplative Reptile"
-                    />
+                        <CardMedia
+                            className={classes.media}
+                            image={`${process.env.PUBLIC_URL}/assets/images/` + ofAllCoupon.image}
+                            title="Contemplative Reptile"
+                        />
 
+                        <CardContent>
+                            <Typography className="Typography1" gutterBottom variant="h6" component="h2">
+                                Company ID: {ofAllCoupon.companyID} <br />
+                                {ofAllCoupon.title}
+                            </Typography>
 
-                    <CardContent>
-                        <Typography className="Typography1" gutterBottom variant="h6" component="h2">
-                            Company ID: {coupon.companyID} <br />
-                            {coupon.title}
-                        </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                Category: <br /> {ofAllCoupon.category} <br />
+                                Description: &nbsp; {ofAllCoupon.description} <br />
+                                Amount: &nbsp; {ofAllCoupon.amount} <br />
+                                Start-Date: &nbsp; {moment(ofAllCoupon.startDate).format('D/M/YYYY')} <br />
+                                End-Date: &nbsp; {moment(ofAllCoupon.endDate).format('D/M/YYYY')} <br />
+                                Price: &nbsp; {ofAllCoupon.price}
+                            </Typography>
 
-                        <Typography variant="body2" color="textSecondary" component="p">
-                            Category: <br /> {coupon.category} <br />
-                            Description: &nbsp; {coupon.description} <br />
-                            Amount: &nbsp; {coupon.amount} <br />
-                            Start-Date: &nbsp; {startDate} <br />
-                            End-Date: &nbsp; {endDate} <br />
-                            Price: &nbsp; {coupon.price}
-                        </Typography>
+                        </CardContent>
 
-                    </CardContent>
-
-                </CardActionArea>
+                    </CardActionArea>
+                }
 
                 <CardActions>
-                    <p>Operations:</p>
-                    <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
-                        <Button color="primary">
-                            <NavLink className="linkTo" to={routeTo}>
-                                Go Back
-                            </NavLink>
-                        </Button>
+                    {store.getState().authState.user?.clientType === 'COMPANY' &&
+                    store.getState().couponsState.coupons.find((c) => c.id === coupon.id) &&
+                        <div>
+                            <p>Operations:</p> <br />
+                            <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
-                        {store.getState().authState.user.clientType === 'COMPANY' &&
-                            <Button onClick={() => deleteCoupon(coupon.id)}>Delete</Button>
-                        }
-                    </ButtonGroup>
+                                <Button color="primary" onClick={yourSpace}>
+                                    {/* <NavLink className="linkTo" to={routeTo}>
+                                        Your Space
+                                    </NavLink> */}
+                                    Your Space
+                                </Button>
+
+                                <Button color="primary" onClick={toMain}>
+                                    {/* <NavLink className="linkTo" to={routeTo}>
+                                        Your Space
+                                    </NavLink> */}
+                                    To Main
+                                </Button>
+
+                                <Button color="primary">
+                                    <NavLink className="link" to={"/update-company-coupon/" + ofAllCoupon.id}>
+                                        Update
+                                    </NavLink>
+                                </Button>
+
+                                <Button onClick={() => deleteCoupon(ofAllCoupon.id)}>Delete</Button>
+
+                            </ButtonGroup>
+                        </div>
+                    }
+
+                    {store.getState().authState.user?.clientType !== 'COMPANY' &&
+                        <div>
+                            <p>Operations:</p> <br />
+                            <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
+
+                            <Button color="primary" onClick={yourSpace}>
+                                    {/* <NavLink className="linkTo" to={routeTo}>
+                                        Your Space
+                                    </NavLink> */}
+                                    Your Space
+                                </Button>
+
+                                <Button color="primary" onClick={toMain}>
+                                    {/* <NavLink className="linkTo" to={routeTo}>
+                                        Your Space
+                                    </NavLink> */}
+                                    To Main
+                                </Button>
+
+                                <Button onClick={() => purchaseCoupon(ofAllCoupon.id)}>Purchase</Button>
+
+                            </ButtonGroup>
+                        </div>
+                    }
+
                 </CardActions>
 
             </Card>
 
         </div>
     );
-
-
 }
 
 export default CouponDetails;

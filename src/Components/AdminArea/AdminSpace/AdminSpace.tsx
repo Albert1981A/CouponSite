@@ -18,100 +18,101 @@ import "./AdminSpace.css";
 
 function AdminSpace(props: {}): JSX.Element {
 
-    // let request: string = "Customers";
-    // let unsubscribe: Unsubscribe;
     const history = useHistory();
+
+    if (!store.getState().authState.user) {
+        notify.error(ErrMsg.PLS_LOGIN);
+        history.push("/login");
+    } else if (store.getState().authState.user?.clientType !== "ADMINISTRATOR") {
+        notify.error(ErrMsg.ONLY_ADMIN_ALLOWED);
+        history.push("/home");
+    }
 
     const [request, setRequest] = useState("");
 
-    const [companies, setCompanies] = useState(
-        store.getState().companiesState.companies
-    );
+    // const [companies, setCompanies] = useState(
+    //     store.getState().companiesState.companies
+    // );
 
-    const [customers, setCustomers] = useState(
-        store.getState().customersState.customers
-    );
+    // const [customers, setCustomers] = useState(
+    //     store.getState().customersState.customers
+    // );
 
     function GetAllCompanies() {
         setRequest("Companies");
+        history.push("/admin-companies");
     }
 
     function GetAllCustomers() {
         setRequest("Customers");
+        history.push("/admin-customers");
     }
 
-    async function asyncCompanyFunction() {
-        if (companies.length === 0) {
-            try {
-                const response = await tokenAxios.get<CompanyModel[]>(globals.urls.admin + "companies");
-                console.log(response.data);
-                if (response.data.length !== 0) {
-                    store.dispatch(companiesDownloadedAction(response.data)); // updating AppState (global state)
-                    setCompanies(store.getState().companiesState.companies); // updating the local state
-                }
-            } catch (err) {
-                // alert(err.message);
-                notify.error(ErrMsg.ERROR_OCCURRED_WHILE_GETTING_COMPANIES);
-            }
-        }
-    }
+    // async function asyncCompanyFunction() {
+    //     if (companies.length === 0) {
+    //         try {
+    //             const response = await tokenAxios.get<CompanyModel[]>(globals.urls.admin + "companies");
+    //             console.log(response.data);
+    //             if (response.data.length !== 0) {
+    //                 store.dispatch(companiesDownloadedAction(response.data)); // updating AppState (global state)
+    //                 setCompanies(store.getState().companiesState.companies); // updating the local state
+    //             }
+    //         } catch (err) {
+    //             // alert(err.message);
+    //             notify.error(ErrMsg.ERROR_GETTING_COMPANIES);
+    //         }
+    //     }
+    // }
 
-    async function asyncCustomersFunction() {
-        if (customers.length === 0) {
-            try {
-                const response = await tokenAxios.get<CustomerModel[]>(globals.urls.admin + "customers");
-                if (response.data.length !== 0) {
-                    store.dispatch(customersDownloadedAction(response.data)); // updating AppState (global state)
-                    setCustomers(store.getState().customersState.customers); // updating the local state
-                }
-            } catch (err) {
-                // alert(err.message);
-                notify.error(ErrMsg.ERROR_OCCURRED_WHILE_GETTING_CUSTOMERS);
-                notify.error(err);
-            }
-        }
-    }
-
-    useEffect(() => {
-        if (!store.getState().authState.user) {
-            notify.error(ErrMsg.PLS_LOGIN);
-            history.push("/login");
-        } else if (store.getState().authState.user.clientType !== "ADMINISTRATOR") {
-            notify.error(ErrMsg.ONLY_COMPANY_ALLOWED);
-            history.push("/home");
-        }
-        
-        let subscription1: Unsubscribe;
-        let subscription2: Unsubscribe;
-
-        if (request.match("Companies")) {
-            asyncCompanyFunction();
-            subscription1 = store.subscribe(() => {
-                setCompanies(store.getState().companiesState.companies);
-            });
-        } else if (request.match("Customers")) {
-            asyncCustomersFunction();
-            subscription2 = store.subscribe(() => {
-                setCustomers(store.getState().customersState.customers);
-            });
-        }
-        return () => {
-            function unsubscribe() {
-                subscription1 = store.subscribe(() => {
-                    setCompanies(store.getState().companiesState.companies);
-                });
-                subscription2 = store.subscribe(() => {
-                    setCustomers(store.getState().customersState.customers);
-                });
-            }
-            unsubscribe();
-        };
-    });
+    // async function asyncCustomersFunction() {
+    //     if (customers.length === 0) {
+    //         try {
+    //             const response = await tokenAxios.get<CustomerModel[]>(globals.urls.admin + "customers");
+    //             if (response.data.length !== 0) {
+    //                 store.dispatch(customersDownloadedAction(response.data)); // updating AppState (global state)
+    //                 setCustomers(store.getState().customersState.customers); // updating the local state
+    //             }
+    //         } catch (err) {
+    //             // alert(err.message);
+    //             notify.error(ErrMsg.ERROR_GETTING_CUSTOMERS);
+    //             notify.error(err);
+    //         }
+    //     }
+    // }
 
     // useEffect(() => {
+    //     if (!store.getState().authState.user) {
+    //         notify.error(ErrMsg.PLS_LOGIN);
+    //         history.push("/login");
+    //     } else if (store.getState().authState.user.clientType !== "ADMINISTRATOR") {
+    //         notify.error(ErrMsg.ONLY_COMPANY_ALLOWED);
+    //         history.push("/home");
+    //     }
+        
+    //     let subscription1: Unsubscribe;
+    //     let subscription2: Unsubscribe;
+
+    //     if (request.match("Companies")) {
+    //         asyncCompanyFunction();
+    //         subscription1 = store.subscribe(() => {
+    //             setCompanies(store.getState().companiesState.companies);
+    //         });
+    //     } else if (request.match("Customers")) {
+    //         asyncCustomersFunction();
+    //         subscription2 = store.subscribe(() => {
+    //             setCustomers(store.getState().customersState.customers);
+    //         });
+    //     }
     //     return () => {
+    //         function unsubscribe() {
+    //             subscription1 = store.subscribe(() => {
+    //                 setCompanies(store.getState().companiesState.companies);
+    //             });
+    //             subscription2 = store.subscribe(() => {
+    //                 setCustomers(store.getState().customersState.customers);
+    //             });
+    //         }
     //         unsubscribe();
-    //         console.log('Bye');
     //     };
     // });
 
@@ -146,7 +147,7 @@ function AdminSpace(props: {}): JSX.Element {
                 </Typography> 
             } */}
 
-            {request.match("Companies") &&
+            {/* {request.match("Companies") &&
                 <div className="companiesDiv">
                     <Typography variant="h5" noWrap>
                         <Box className="head1" fontWeight="fontWeightMedium">ALL COMPANIES: &nbsp; &nbsp;</Box>
@@ -172,9 +173,9 @@ function AdminSpace(props: {}): JSX.Element {
                         </Grid>
                     </div>
                 </div>
-            }
+            } */}
 
-            {request.match("Customers") &&
+            {/* {request.match("Customers") &&
                 <div className="CustomersDiv">
                     <Typography variant="h5" noWrap>
                         <Box className="head1" fontWeight="fontWeightMedium">ALL CUSTOMERS: &nbsp; &nbsp;</Box>
@@ -199,7 +200,7 @@ function AdminSpace(props: {}): JSX.Element {
                         </Grid>
                     </div>
                 </div>
-            }
+            } */}
 
 
 

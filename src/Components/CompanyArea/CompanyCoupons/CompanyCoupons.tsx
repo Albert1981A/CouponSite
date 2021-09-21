@@ -47,7 +47,7 @@ function CompanyCoupons(props: {}): JSX.Element {
                     }
                 } catch (err) {
                     // alert(err.message);
-                    notify.error(ErrMsg.ERROR_OCCURRED_WHILE_GETTING_COUPONS);
+                    notify.error(ErrMsg.ERROR_GETTING_COUPONS);
                     notify.error(err);
                 }
             }
@@ -100,7 +100,7 @@ function CompanyCoupons(props: {}): JSX.Element {
                 This section shows all the company's coupons.
                 You can add and remove coupons and you can also update the existing coupons.
                 Please note that a coupon with the same title to an existing coupon should not be added.
-                If an existing coupon is updated, it is not possible to update the coupon code. Also, you cannot updated the company code.
+                If an existing coupon is updated, it is not possible to update the coupon id. Also, you cannot updated the company id.
             </Typography>
 
             <div className="cards Box">

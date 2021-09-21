@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import CouponModel from "../../../Models/CouponModel";
 import { logoutAction } from "../../../Redux/AuthAppState";
+import { couponsDeleteAllAction, couponsUpdatedAction } from "../../../Redux/CouponsState";
 import store from "../../../Redux/Store";
 import globals from "../../../Service/Globals";
 import tokenAxios from "../../../Service/InterceptorAxios";
@@ -15,9 +17,10 @@ function Logout(): JSX.Element {
         try {
             console.log(logoutDetails);
             console.log(globals.urls.client + "logout");
-
             const response = await tokenAxios.delete(globals.urls.client + "logout");
+            store.dispatch(couponsDeleteAllAction());
             console.log(response);
+            
         }
         catch (err) {
             notify.error(err);

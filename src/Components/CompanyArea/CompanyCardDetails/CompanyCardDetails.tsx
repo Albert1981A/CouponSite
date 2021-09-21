@@ -62,13 +62,21 @@ function CompanyCardDetails(props: CompanyCardDetailsProps): JSX.Element {
             try {
                 const response = await tokenAxios.delete<any>(globals.urls.admin + "companies/" + id);
                 store.dispatch(companiesDeletedAction(id)); // updating AppState (global state)
-                history.push(routeTo);
+                history.push("/admin-companies");
             } catch (err) {
                 // alert(err.message);
-                notify.error(ErrMsg.ERROR_OCCURRED_WHILE_DELETING_COMPANY);
+                notify.error(ErrMsg.ERROR_DELETING_COMPANY);
                 notify.error(err);
             }
         }
+    }
+
+    function goBack() {
+        history.goBack();
+    }
+
+    function goToUpdate() {
+        history.push("/update-company-details/" + company.id);
     }
 
     return (
@@ -78,48 +86,52 @@ function CompanyCardDetails(props: CompanyCardDetailsProps): JSX.Element {
 
                 {/* <NavLink className="navLink" to={"/company-card-details/" + company.id} exact> */}
 
-                    <CardActionArea className="navLink3">
+                <CardActionArea className="navLink3">
 
-                        <CardMedia
-                            className={classes.media}
-                            image={`${process.env.PUBLIC_URL}/assets/images/` + company.name + '.jpg'}
-                            title="Company details"
-                        />
+                    <CardMedia
+                        className={classes.media}
+                        image={`${process.env.PUBLIC_URL}/assets/images/` + company.name + '.jpg'}
+                        title="Company details"
+                    />
 
 
-                        <CardContent>
-                            <Typography gutterBottom variant="h6" component="h2">
-                                Company name: {company.name} <br />
-                                Company ID: {company.id}
-                            </Typography>
+                    <CardContent>
+                        <Typography gutterBottom variant="h6" component="h2">
+                            Name: {company.name} <br />
+                            ID: {company.id}
+                        </Typography>
 
-                            <Typography variant="body2" color="textSecondary" component="p">
-                                Company email:  &nbsp; {company.email}
-                            </Typography>
+                        <Typography variant="body2" color="textSecondary" component="p">
+                            Email:  &nbsp; {company.email}
+                        </Typography>
 
-                        </CardContent>
+                    </CardContent>
 
-                    </CardActionArea>
+                </CardActionArea>
 
                 {/* </NavLink> */}
 
                 <CardActions>
-                    <p>Operations:</p>
+                    <p>Operations:</p> <br />
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
-                        <Button color="primary">
-                            <NavLink className="link" to={routeTo}>
+                        <Button color="primary" onClick={goBack}>
+                            {/* <NavLink className="link" to={routeTo}>
                                 Go Back
-                            </NavLink>
+                            </NavLink> */}
+                            Back
                         </Button>
 
-                        <Button color="primary">
-                            <NavLink className="link" to={"/update-company-details/" + company.id}>
-                                Update Company
-                            </NavLink>
+                        <Button color="primary" onClick={goToUpdate}>
+                            {/* <NavLink className="link" to={"/update-company-details/" + company.id}>
+                                Update
+                            </NavLink> */}
+                            Update
                         </Button>
 
-                        <Button onClick={() => deleteCompany(company.id)}>Delete Company</Button>
+                        <Button onClick={() => deleteCompany(company.id)}>
+                            Delete
+                        </Button>
 
                     </ButtonGroup>
                 </CardActions>

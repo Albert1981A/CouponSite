@@ -4,3 +4,8 @@
     color: #00897b;
     border-color: #00897b;
 }
+
+.AddCoupon input{    
+    width: 200px;
+    height: 30px;
+}

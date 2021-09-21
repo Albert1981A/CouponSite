@@ -1,4 +1,6 @@
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+import AdminCompanies from "../../AdminArea/AdminCompanies/AdminCompanies";
+import AdminCustomers from "../../AdminArea/AdminCustomers/AdminCustomers";
 import AdminSpace from "../../AdminArea/AdminSpace/AdminSpace";
 import UpdateCompanyDetails from "../../AdminArea/UpdateCompanyDetails/UpdateCompanyDetails";
 import UpdateCustomerDetails from "../../AdminArea/UpdateCustomerDetails/UpdateCustomerDetails";
@@ -10,6 +12,7 @@ import CompanyCoupons from "../../CompanyArea/CompanyCoupons/CompanyCoupons";
 import UpdateCompanyCoupon from "../../CompanyArea/UpdateCompanyCoupon/UpdateCompanyCoupon";
 import AddCoupon from "../../CouponArea/AddCoupon/AddCoupon";
 import CouponDetails from "../../CouponArea/CouponDetails/CouponDetails";
+import PurchaseCoupon from "../../CouponArea/PurchaseCoupon/PurchaseCoupon";
 import CustomerCardDetails from "../../CustomerArea/CustomerCardDetails/CustomerCardDetails";
 import CustomerCoupons from "../../CustomerArea/CustomerCoupons/CustomerCoupons";
 import About from "../../MenuArea/About/About";
@@ -33,7 +36,10 @@ function Routing(): JSX.Element {
                 <Route path="/update-company-coupon/:id" component={UpdateCompanyCoupon} exact />
                 <Route path="/customer-coupons" component={CustomerCoupons} exact />
                 <Route path="/customer-card-details/:id" component={CustomerCardDetails} exact />
+                <Route path="/purchase-coupon/:id" component={PurchaseCoupon} exact />
                 <Route path="/admin-space" component={AdminSpace} exact />
+                <Route path="/admin-companies" component={AdminCompanies} exact />
+                <Route path="/admin-customers" component={AdminCustomers} exact />
                 <Route path="/update-company-details/:id" component={UpdateCompanyDetails} exact />
                 <Route path="/update-customer-details/:id" component={UpdateCustomerDetails} exact />
                 <Route path="/add-coupon" component={AddCoupon} exact />

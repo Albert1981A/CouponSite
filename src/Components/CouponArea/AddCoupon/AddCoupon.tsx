@@ -60,39 +60,43 @@ function AddCoupon(): JSX.Element {
     const theme = useTheme();
 
     const { register, handleSubmit, formState: { errors, isDirty, isValid } } = useForm<CouponLoadModel>({ mode: "onTouched" });
-    const history = useHistory(); 
+    const history = useHistory();
 
     async function send(coupon: CouponLoadModel) {
         console.log(coupon);
-        try {
-            // const formData = new FormData();
-            // formData.append("companyID", coupon.companyID.toString());
-            // formData.append("category", coupon.category.toString());
-            // formData.append("title", coupon.title);
-            // formData.append("description", coupon.description);
-            // formData.append("startDate", coupon.startDate.toString());
-            // formData.append("endDate", coupon.endDate.toString());
-            // formData.append("amount", coupon.amount.toString());
-            // formData.append("price", coupon.price.toString());
-            // formData.append("image", coupon.image);
-            // console.log(formData);
+        if (store.getState().couponsState.coupons.find(c => c.title === coupon.title)) {
+            notify.error(ErrMsg.TITLE_EXIST);
+        } else {
+            try {
+                // const formData = new FormData();
+                // formData.append("companyID", coupon.companyID.toString());
+                // formData.append("category", coupon.category.toString());
+                // formData.append("title", coupon.title);
+                // formData.append("description", coupon.description);
+                // formData.append("startDate", coupon.startDate.toString());
+                // formData.append("endDate", coupon.endDate.toString());
+                // formData.append("amount", coupon.amount.toString());
+                // formData.append("price", coupon.price.toString());
+                // formData.append("image", coupon.image);
+                // console.log(formData);
 
-            // Sending token without interceptor
-            // const headers = { "authorization": store.getState().authState.user.token };
-            // const response = await axios.post<CouponModel>(globals.urls.company + "coupons", coupon, { headers });
+                // Sending token without interceptor
+                // const headers = { "authorization": store.getState().authState.user.token };
+                // const response = await axios.post<CouponModel>(globals.urls.company + "coupons", coupon, { headers });
 
-            // Sending token with interceptor
-            // const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", coupon);
+                // Sending token with interceptor
+                // const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", coupon);
 
-            // Sending request with no token
-            const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", coupon);
-            const added = response.data;
-            console.log(added);
-            store.dispatch(couponsAddedAction(added));
-            notify.success(SccMsg.ADDED);
-            history.push("/company-coupons")
-        } catch (err) {
-            notify.error(err);
+                // Sending request with no token
+                const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", coupon);
+                const added = response.data;
+                console.log(added);
+                store.dispatch(couponsAddedAction(added));
+                notify.success(SccMsg.ADDED);
+                history.push("/company-coupons")
+            } catch (err) {
+                notify.error(err);
+            }
         }
     }
 
@@ -137,7 +141,7 @@ function AddCoupon(): JSX.Element {
             <form className={classes.root} noValidate autoComplete="off" onSubmit={handleSubmit(send)}>
 
                 {/* public companyID ? : number; */}
-                <TextField
+                {/* <TextField
                     id="outlined-textarea-1"
                     type="number"
                     name="company id"
@@ -145,6 +149,21 @@ function AddCoupon(): JSX.Element {
                     placeholder="Company ID"
                     multiline
                     variant="outlined"
+                    value={user.clientId}
+                    {...register("companyID", {
+                        required: { value: true, message: 'Missing company id' }
+                    })}
+                />
+                <br />
+                <span>{errors.companyID?.message}</span>
+                <br /> */}
+
+                <label>Company Id</label> <br />
+                <input
+                    id="outlined-textarea-1"
+                    type="number"
+                    name="company id"
+                    placeholder="Company ID"
                     value={user.clientId}
                     {...register("companyID", {
                         required: { value: true, message: 'Missing company id' }
@@ -339,7 +358,7 @@ function AddCoupon(): JSX.Element {
                 <br />
 
                 {/* public image ? : string; */}
-                <TextField
+                {/* <TextField
                     id="outlined-textarea-8"
                     type="text"
                     name="image"
@@ -355,10 +374,26 @@ function AddCoupon(): JSX.Element {
                 />
                 <br />
                 <span>{errors.price?.message}</span>
+                <br /> */}
+
+                <label>Image</label> <br />
+                <input
+                    id="outlined-textarea-8"
+                    type="text"
+                    name="image"
+                    placeholder="Image"
+                    value={user.clientName + ".jpg"}
+                    {...register("image", {
+                        required: { value: true, message: 'Missing image!' },
+                        minLength: { value: 2, message: 'Minimum length of 2 Characters!' }
+                    })}
+                />
+                <br />
+                <span>{errors.price?.message}</span>
                 <br />
 
                 {/* <input type="submit" disabled={!isDirty || !isValid} value="Register" /> */}
-                <Button variant="contained" type="submit" color="primary" value="Register" >Register</Button>
+                <Button variant="contained" type="submit" color="primary" value="Register" disabled={!isDirty || !isValid}>Add Coupon</Button>
                 <br />
 
             </form>

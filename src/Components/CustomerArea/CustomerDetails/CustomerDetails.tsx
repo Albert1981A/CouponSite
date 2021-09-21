@@ -1,5 +1,5 @@
 import { Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardMedia, makeStyles, Typography } from "@material-ui/core";
-import { NavLink } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import CustomerModel from "../../../Models/CustomerModel";
 import { customersDeletedAction } from "../../../Redux/CustomersState";
 import store from "../../../Redux/Store";
@@ -23,6 +23,7 @@ const useStyles = makeStyles({
 
 function CustomerDetails(_props: CustomerProps): JSX.Element {
 
+    const history = useHistory();
     const classes = useStyles();
     const prop1 = { ..._props.customer }
 
@@ -32,12 +33,17 @@ function CustomerDetails(_props: CustomerProps): JSX.Element {
             try {
                 const response = await tokenAxios.delete<any>(globals.urls.admin + "customers/" + id);
                 store.dispatch(customersDeletedAction(id)); // updating AppState (global state)
+                // history.push("/admin-customers");
             } catch (err) {
                 // alert(err.message);
-                notify.error(ErrMsg.ERROR_OCCURRED_WHILE_DELETING_CUSTOMER);
+                notify.error(ErrMsg.ERROR_DELETING_CUSTOMER);
                 notify.error(err);
             }
         }
+    }
+
+    function toUpdate() {
+        history.push("/update-customer-details/" + prop1.id);
     }
 
     return (
@@ -76,13 +82,13 @@ function CustomerDetails(_props: CustomerProps): JSX.Element {
                     <p>Operations:</p>
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
-                        <Button color="primary">
+                        <Button color="primary" onClick={toUpdate}>
                             <NavLink className="link" to={"/update-customer-details/" + prop1.id}>
-                                Update Customer
+                                Update
                             </NavLink>
                         </Button>
 
-                        <Button onClick={() => deleteCustomer(prop1.id)}>Delete Customer</Button>
+                        <Button onClick={() => deleteCustomer(prop1.id)}>Delete</Button>
                     </ButtonGroup>
                 </CardActions>
 
