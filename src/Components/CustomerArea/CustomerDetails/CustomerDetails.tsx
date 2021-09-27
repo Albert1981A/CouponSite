@@ -1,5 +1,7 @@
 import { Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardMedia, makeStyles, Typography } from "@material-ui/core";
+import { useEffect, useState } from "react";
 import { NavLink, useHistory } from "react-router-dom";
+import { Unsubscribe } from "redux";
 import CustomerModel from "../../../Models/CustomerModel";
 import { customersDeletedAction } from "../../../Redux/CustomersState";
 import store from "../../../Redux/Store";
@@ -27,15 +29,34 @@ function CustomerDetails(_props: CustomerProps): JSX.Element {
     const classes = useStyles();
     const prop1 = { ..._props.customer }
 
+    const [customer, setCustomer] = useState(
+        store.getState().customersState.customers.find((c) => c.id === _props.customer.id)
+    );
+
+    useEffect(() => {
+        let subscription: Unsubscribe;
+
+        subscription = store.subscribe(() => {
+            setCustomer(store.getState().customersState.customers.find((c) => c.id === _props.customer.id));
+        });
+
+        return () => {
+            function unsubscribe() {
+                subscription = store.subscribe(() => {
+                    setCustomer(store.getState().customersState.customers.find((c) => c.id === _props.customer.id));
+                });
+            }
+            unsubscribe();
+        };
+    });
+
     async function deleteCustomer(id: number): Promise<void> {
         const result = window.confirm("Are you sure you want to delete customer id - " + id + "?");
         if (result) {
             try {
                 const response = await tokenAxios.delete<any>(globals.urls.admin + "customers/" + id);
-                store.dispatch(customersDeletedAction(id)); // updating AppState (global state)
-                // history.push("/admin-customers");
+                store.dispatch(customersDeletedAction(id)); 
             } catch (err) {
-                // alert(err.message);
                 notify.error(ErrMsg.ERROR_DELETING_CUSTOMER);
                 notify.error(err);
             }
@@ -43,7 +64,7 @@ function CustomerDetails(_props: CustomerProps): JSX.Element {
     }
 
     function toUpdate() {
-        history.push("/update-customer-details/" + prop1.id);
+        history.push("/update-customer-details/" + customer.id);
     }
 
     return (
@@ -51,25 +72,25 @@ function CustomerDetails(_props: CustomerProps): JSX.Element {
 			
             <Card className={classes.root}>
 
-                <NavLink className="navLink" to={"/customer-card-details/" + prop1.id} exact>
+                <NavLink className="navLink" to={"/customer-card-details/" + customer.id} exact>
 
                     <CardActionArea>
 
                         <CardMedia
                             className={classes.media}
                             image={`${process.env.PUBLIC_URL}/assets/images/customer/customer.png`}
-                            title="Company details"
+                            title="Customer details"
                         />
 
                         <CardContent>
                             <Typography gutterBottom variant="h6" component="h2">
-                                Customer ID: {prop1.id}
+                                Customer ID: {customer.id}
                             </Typography>
 
                             <Typography variant="body2" color="textSecondary" component="p">
-                                First name: {prop1.firstName} <br />
-                                Last name: {prop1.lastName} <br />
-                                Email:  &nbsp; {prop1.email}
+                                First name: {customer.firstName} <br />
+                                Last name: {customer.lastName} <br />
+                                Email:  &nbsp; {customer.email}
                             </Typography>
 
                         </CardContent>
@@ -83,12 +104,16 @@ function CustomerDetails(_props: CustomerProps): JSX.Element {
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                         <Button color="primary" onClick={toUpdate}>
-                            <NavLink className="link" to={"/update-customer-details/" + prop1.id}>
+                            {/* <NavLink className="link" to={"/update-customer-details/" + prop1.id}>
                                 Update
-                            </NavLink>
+                            </NavLink> */}
+                            Update
                         </Button>
 
-                        <Button onClick={() => deleteCustomer(prop1.id)}>Delete</Button>
+                        <Button onClick={() => deleteCustomer(customer.id)}>
+                            Delete
+                        </Button>
+                        
                     </ButtonGroup>
                 </CardActions>
 

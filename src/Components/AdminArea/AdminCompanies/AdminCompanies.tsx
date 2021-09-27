@@ -1,5 +1,5 @@
-import { Box, Button, ButtonGroup, Grid, Typography } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { Box, Button, ButtonGroup, Grid, Input, Typography } from "@material-ui/core";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Unsubscribe } from "redux";
 import CompanyModel from "../../../Models/CompanyModel";
@@ -16,8 +16,6 @@ function AdminCompanies(props: {}): JSX.Element {
 
     const history = useHistory();
 
-    // const [request, setRequest] = useState("");
-
     const [companies, setCompanies] = useState(
         store.getState().companiesState.companies
     );
@@ -32,7 +30,6 @@ function AdminCompanies(props: {}): JSX.Element {
                     setCompanies(store.getState().companiesState.companies); // updating the local state
                 }
             } catch (err) {
-                // alert(err.message);
                 notify.error(ErrMsg.ERROR_GETTING_COMPANIES);
                 notify.error(err);
             }
@@ -48,13 +45,12 @@ function AdminCompanies(props: {}): JSX.Element {
             history.push("/home");
         }
 
-        let subscription: Unsubscribe;
-
         asyncCompanyFunction();
+
+        let subscription: Unsubscribe;
         subscription = store.subscribe(() => {
             setCompanies(store.getState().companiesState.companies);
         });
-
         return () => {
             function unsubscribe() {
                 subscription = store.subscribe(() => {
@@ -63,16 +59,43 @@ function AdminCompanies(props: {}): JSX.Element {
             }
             unsubscribe();
         };
+
+        // let unsubscribe: Unsubscribe;
+        // unsubscribe = store.subscribe(() => {
+        //     setCompanies(store.getState().companiesState.companies);
+        // });
+        // return () => {
+        //     unsubscribe();
+        // };
     });
 
-    function GetAllCompanies() {
-        // setRequest("Companies");
+    const [txt, setTxt] = useState<string>("");
+
+    const insertId = (args: SyntheticEvent) => {
+        // args        => information about the Event
+        // args.target => the tag that raised the Event
+        const value = (args.target as HTMLInputElement).value;
+        setTxt(value);
+    }
+
+    async function getSingleCompany() {
+        if (!companies.find((c) => c.id === parseInt(txt))) {
+            notify.error(ErrMsg.NO_COMPANY_BY_THIS_ID);
+        } else {
+            history.push("/company-card-details/" + txt);
+        }
+    }
+
+    function getAllCompanies() {
         history.push("/admin-companies");
     }
 
-    function GetAllCustomers() {
-        // setRequest("Customers");
+    function getAllCustomers() {
         history.push("/admin-customers");
+    }
+
+    function addCompany() {
+        history.push("/admin-add-company");
     }
 
     return (
@@ -86,13 +109,23 @@ function AdminCompanies(props: {}): JSX.Element {
                 <div className="topButtonsGroup">
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
-                        <Button color="primary" onClick={GetAllCompanies}>
+                        <Button color="primary" onClick={getAllCustomers}>
+                            All Customers
+                        </Button>
+
+                        <Button color="primary" onClick={getAllCompanies}>
                             All Companies
                         </Button>
 
-                        <Button color="primary" onClick={GetAllCustomers}>
-                            All Customers
+                        <Button color="primary" onClick={addCompany}>
+                            Add Company
                         </Button>
+
+                        <Button color="primary" onClick={getSingleCompany} value={txt}>
+                            Get Single Company by id:
+                        </Button>
+
+                        <input className="inputId" type="text" onChange={insertId} value={txt} />
 
                     </ButtonGroup>
                 </div>
@@ -101,17 +134,17 @@ function AdminCompanies(props: {}): JSX.Element {
             <br />
 
             <div className="companiesDiv">
-                    <Typography variant="h5" noWrap>
-                        <Box className="head1" fontWeight="fontWeightMedium">ALL COMPANIES: &nbsp; &nbsp;</Box>
-                    </Typography>
-                    <Typography paragraph>
-                        This section shows all the companies.
-                        You can add and remove companies and you can also update the existing companies.
-                        Please note that it is not possible to add a company with the same name or email
-                        to an existing company.
-                        If an existing company is updated, The company id could not be updated.
-                        Also, you cannot update the company name.
-                    </Typography>
+                <Typography variant="h5" noWrap>
+                    <Box className="head1" fontWeight="fontWeightMedium">ALL COMPANIES: &nbsp; &nbsp;</Box>
+                </Typography>
+                <Typography paragraph>
+                    This section shows all the companies.
+                    You can add and remove companies and you can also update the existing companies.
+                    Please note that it is not possible to add a company with the same name or email
+                    to an existing company.
+                    If an existing company is updated, The company id could not be updated.
+                    Also, you cannot update the company name.
+                </Typography>
 
                     <div className="cards Box">
                         <Grid container spacing={4}>
@@ -124,7 +157,9 @@ function AdminCompanies(props: {}): JSX.Element {
                             )}
                         </Grid>
                     </div>
-                </div>
+                
+
+            </div>
 
         </div>
     );

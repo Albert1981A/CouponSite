@@ -61,7 +61,7 @@ function CustomerCoupons(props: {}): JSX.Element {
     });
 
     function handleClick1(): void {
-        history.push("/add-coupon");
+        history.push("/home");
     }
 
     function handleClick2(): void {
@@ -80,7 +80,7 @@ function CustomerCoupons(props: {}): JSX.Element {
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                         <Button color="primary" onClick={handleClick1}>
-                            Add Coupon
+                            Purchase Coupon
                         </Button>
 
                         <Button color="primary" onClick={handleClick2}>

@@ -2,8 +2,8 @@
 	align-items: center;
 }
 
-.Login span{
-    color:tomato;
+.errorMassage{
+    color:red;
 }
 
 .Login {

@@ -3,8 +3,9 @@ import moment from "moment";
 import { Component, useEffect, useState } from "react";
 import { NavLink, RouteComponentProps, useHistory, useParams } from "react-router-dom";
 import { Unsubscribe } from "redux";
+import CouponsModel from "../../../Models/CouponModel";
 import CouponModel from "../../../Models/CouponModel";
-import { couponsDeletedAction } from "../../../Redux/CouponsState";
+import { couponsAddedAction, couponsDeletedAction } from "../../../Redux/CouponsState";
 import store from "../../../Redux/Store";
 import globals from "../../../Service/Globals";
 import tokenAxios from "../../../Service/InterceptorAxios";
@@ -40,7 +41,9 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
         routeTo = "/company-coupons";
     } else if (store.getState().authState.user?.clientType === "CUSTOMER") {
         routeTo = "/customer-coupons";
-    } 
+    } else if (store.getState().authState.user?.clientType === "ADMINISTRATOR") {
+        routeTo = "/admin-space";
+    }
 
     if (!store.getState().authState.user) {
         notify.error(ErrMsg.PLS_LOGIN);
@@ -62,29 +65,29 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
             setCoupon(store.getState().couponsState.coupons.find((c) => c.id === id));
         }
 
-        let subscription: Unsubscribe;
-        let subscription2: Unsubscribe;
+        // let subscription: Unsubscribe;
+        // let subscription2: Unsubscribe;
 
-        subscription = store.subscribe(() => {
-            setOfAllCoupon(store.getState().couponsState.allCoupons.find((c) => c.id === id));
-        });
+        // subscription = store.subscribe(() => {
+        //     setOfAllCoupon(store.getState().couponsState.allCoupons.find((c) => c.id === id));
+        // });
 
-        subscription2 = store.subscribe(() => {
-            setCoupon(store.getState().couponsState.coupons.find((c) => c.id === id));
-        });
+        // subscription2 = store.subscribe(() => {
+        //     setCoupon(store.getState().couponsState.coupons.find((c) => c.id === id));
+        // });
 
-        return () => {
-            function unsubscribe() {
-                subscription = store.subscribe(() => {
-                    setOfAllCoupon(store.getState().couponsState.allCoupons.find((c) => c.id === id));
-                });
+        // return () => {
+        //     function unsubscribe() {
+        //         subscription = store.subscribe(() => {
+        //             setOfAllCoupon(store.getState().couponsState.allCoupons.find((c) => c.id === id));
+        //         });
 
-                subscription2 = store.subscribe(() => {
-                    setCoupon(store.getState().couponsState.coupons.find((c) => c.id === id));
-                });
-            }
-            unsubscribe();
-        };
+        //         subscription2 = store.subscribe(() => {
+        //             setCoupon(store.getState().couponsState.coupons.find((c) => c.id === id));
+        //         });
+        //     }
+        //     unsubscribe();
+        // };
     })
 
     // console.log("start Date: " + coupon.startDate);
@@ -94,7 +97,7 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
 
 
     async function deleteCoupon(id: number): Promise<void> {
-        const result = window.confirm("Are you sure you want to delete cat id - " + id + "?");
+        const result = window.confirm("Are you sure you want to delete coupon id - " + id + "?");
         if (result) {
             try {
                 const response = await tokenAxios.delete<any>(globals.urls.company + "coupons/" + id);
@@ -110,11 +113,24 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
 
     console.log(coupon);
 
-    function purchaseCoupon(id: number): void {
-        if (store.getState().authState.user.clientType === "CUSTOMER") {
-            history.push("/purchase-coupon/" + id);
-        } else {
+    async function purchaseCoupon(coupon: CouponModel): Promise<void> {
+        if (store.getState().authState.user?.clientType !== "CUSTOMER") {
             notify.error(ErrMsg.ONLY_CUSTOMER_ALLOWED);
+        } else if (store.getState().couponsState.coupons.find((c) => c.id === id)) {
+            notify.error(ErrMsg.ALREADY_OWN_THIS_COUPON);
+        } else {
+            const result = window.confirm("Are you sure you want to add coupon id - " + id + "?");
+            if (result) {
+                try {
+                    const response = await tokenAxios.post<CouponsModel>(globals.urls.customer + "coupons", coupon);
+                    store.dispatch(couponsAddedAction(response.data)); // updating AppState (global state)
+                    history.push("/customer-coupons");
+                } catch (err) {
+                    // alert(err.message);
+                    notify.error(ErrMsg.ERROR_DELETING_COUPON);
+                    notify.error(err);
+                }
+            }
         }
     }
 
@@ -124,6 +140,10 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
 
     function toMain() {
         history.push("/home");
+    }
+
+    function toUpdate() {
+        history.push("/update-company-coupon/" + ofAllCoupon.id);
     }
 
     return (
@@ -146,6 +166,7 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
                             </Typography>
 
                             <Typography variant="body2" color="textSecondary" component="p">
+                                Coupon ID: &nbsp; {ofAllCoupon.id} <br />
                                 Category: <br /> {ofAllCoupon.category} <br />
                                 Description: &nbsp; {ofAllCoupon.description} <br />
                                 Amount: &nbsp; {ofAllCoupon.amount} <br />
@@ -162,7 +183,7 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
                 <CardActions>
 
                     {store.getState().authState.user?.clientType === 'COMPANY' &&
-                    store.getState().couponsState.coupons.find((c) => c.id === coupon.id) &&
+                        store.getState().couponsState.coupons.find((c) => c.id === coupon.id) &&
                         <div>
                             <p>Operations:</p> <br />
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
@@ -181,13 +202,16 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
                                     To Main
                                 </Button>
 
-                                <Button color="primary">
-                                    <NavLink className="link" to={"/update-company-coupon/" + ofAllCoupon.id}>
+                                <Button color="primary" onClick={toUpdate}>
+                                    {/* <NavLink className="link" to={"/update-company-coupon/" + ofAllCoupon.id}>
                                         Update
-                                    </NavLink>
+                                    </NavLink> */}
+                                    Update
                                 </Button>
 
-                                <Button onClick={() => deleteCoupon(ofAllCoupon.id)}>Delete</Button>
+                                <Button onClick={() => deleteCoupon(ofAllCoupon.id)}>
+                                    Delete
+                                </Button>
 
                             </ButtonGroup>
                         </div>
@@ -198,7 +222,7 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
                             <p>Operations:</p> <br />
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
-                            <Button color="primary" onClick={yourSpace}>
+                                <Button color="primary" onClick={yourSpace}>
                                     {/* <NavLink className="linkTo" to={routeTo}>
                                         Your Space
                                     </NavLink> */}
@@ -212,7 +236,9 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
                                     To Main
                                 </Button>
 
-                                <Button onClick={() => purchaseCoupon(ofAllCoupon.id)}>Purchase</Button>
+                                <Button onClick={() => purchaseCoupon(ofAllCoupon)}>
+                                    Purchase
+                                </Button>
 
                             </ButtonGroup>
                         </div>

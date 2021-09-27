@@ -116,16 +116,10 @@ function CompanyCardDetails(props: CompanyCardDetailsProps): JSX.Element {
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                         <Button color="primary" onClick={goBack}>
-                            {/* <NavLink className="link" to={routeTo}>
-                                Go Back
-                            </NavLink> */}
                             Back
                         </Button>
 
                         <Button color="primary" onClick={goToUpdate}>
-                            {/* <NavLink className="link" to={"/update-company-details/" + company.id}>
-                                Update
-                            </NavLink> */}
                             Update
                         </Button>
 

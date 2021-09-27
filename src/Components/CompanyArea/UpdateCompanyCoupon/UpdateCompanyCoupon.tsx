@@ -74,39 +74,37 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
         store.getState().couponsState.coupons.find((c) => c.id === id)
     );
 
-    // useEffect(() => {
-    //     if (!store.getState().authState.user) {
-    //         notify.error(ErrMsg.PLS_LOGIN);
-    //         history.push("/login")
-    //     }
+    useEffect(() => {
+        if (!store.getState().authState.user) {
+            notify.error(ErrMsg.PLS_LOGIN);
+            history.push("/login")
+        }
+        // unsubscribe = store.subscribe(() => {
+        //     setCoupon(store.getState().couponsState.coupons.find((c) => c.id === id))
+        // })
 
-    //     unsubscribe = store.subscribe(() => {
-    //         setCoupon(store.getState().couponsState.coupons.find((c) => c.id === id))
-    //     })
+        // return () => {
+        //     unsubscribe();
+        //     console.log('Bye');
+        // };
+    });
 
-    //     return () => {
-    //         unsubscribe();
-    //         console.log('Bye');
-    //     };
-    // });
-
-    async function send(coupon: CouponModel) {
-        console.log(coupon);
+    async function send(couponToSend: CouponModel) {
+        // console.log(couponToSend);
+        // console.log(coupon);
         try {
-            const response = await tokenAxios.put<CouponModel>(globals.urls.company + "coupons", coupon);
+            const response = await tokenAxios.put<CouponModel>(globals.urls.company + "coupons", couponToSend);
             const added = response.data;
-            console.log(added.amount);
+            // console.log(added);
             store.dispatch(couponsUpdatedAction(added)); //With Redux
             store.dispatch(allCouponsUpdatedAction(added));
             notify.success(SccMsg.UPDATE_COUPON)
             history.push('/company-coupons')
         }
         catch (err) {
-            // console.log(err.message);
             notify.error(ErrMsg.UPDATE_COUPON);
             notify.error(err);
         }
-
     }
 
     function cancel() {
@@ -182,7 +180,7 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
                     })}
                 />
                 <br />
-                <span className="errorMessage">{errors.companyID?.message}</span>
+                <span className="errorMessage">{errors.id?.message}</span>
                 <br />
 
                 {/* public companyID ? : number; */}

@@ -1,4 +1,4 @@
-import { Button, createStyles, FormControl, Grid, Input, InputLabel, makeStyles, Select, TextField, Theme, ThemeProvider, Typography, useTheme } from "@material-ui/core";
+import { Button, ButtonGroup, createStyles, FormControl, Grid, Input, InputLabel, makeStyles, Select, TextField, Theme, ThemeProvider, Typography, useTheme } from "@material-ui/core";
 import axios from "axios";
 import React from "react";
 import { useEffect } from "react";
@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
 import CouponLoadModel from "../../../Models/CouponLoadModel";
 import CouponModel from "../../../Models/CouponModel";
-import { couponsAddedAction } from "../../../Redux/CouponsState";
+import { allCouponsAddedAction, couponsAddedAction } from "../../../Redux/CouponsState";
 import store from "../../../Redux/Store";
 import globals from "../../../Service/Globals";
 import notify, { ErrMsg, SccMsg } from "../../../Service/Notification";
@@ -19,13 +19,14 @@ import {
 } from '@material-ui/pickers';
 import tokenAxios from "../../../Service/InterceptorAxios";
 import { useState } from "react";
+import { Unsubscribe } from "redux";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             '& .MuiTextField-root': {
                 margin: theme.spacing(1),
-                width: '25ch',
+                width: '40ch',
             },
         },
         formControl: {
@@ -46,6 +47,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function AddCoupon(): JSX.Element {
 
+    const history = useHistory();
     const classes = useStyles();
     const [value, setValue] = React.useState('Controlled');
 
@@ -60,7 +62,6 @@ function AddCoupon(): JSX.Element {
     const theme = useTheme();
 
     const { register, handleSubmit, formState: { errors, isDirty, isValid } } = useForm<CouponLoadModel>({ mode: "onTouched" });
-    const history = useHistory();
 
     async function send(coupon: CouponLoadModel) {
         console.log(coupon);
@@ -85,48 +86,30 @@ function AddCoupon(): JSX.Element {
                 // const response = await axios.post<CouponModel>(globals.urls.company + "coupons", coupon, { headers });
 
                 // Sending token with interceptor
-                // const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", coupon);
-
-                // Sending request with no token
                 const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", coupon);
                 const added = response.data;
                 console.log(added);
                 store.dispatch(couponsAddedAction(added));
+                store.dispatch(allCouponsAddedAction(added));
                 notify.success(SccMsg.ADDED);
                 history.push("/company-coupons")
             } catch (err) {
+                notify.error(ErrMsg.ERROR_WHILE_ADDING_COUPON);
                 notify.error(err);
             }
         }
     }
-
-    const [selectedDate1, setSelectedDate1] = React.useState<Date | null>(
-        new Date(),
-    );
-    const [selectedDate2, setSelectedDate2] = React.useState<Date | null>(
-        new Date(),
-    );
-
-    const handleDateChange1 = (date1: Date | null) => {
-        setSelectedDate1(date1);
-    };
-
-    const handleDateChange2 = (date2: Date | null) => {
-        setSelectedDate2(date2);
-    };
-
-    const [coupons, setCoupons] = useState(store.getState().couponsState.coupons);
 
     useEffect(() => {
         if (!store.getState().authState.user) {
             notify.error(ErrMsg.PLS_LOGIN);
             history.push("/login");
         }
-        const unsubscribe = store.subscribe(() => {
-            setCoupons(store.getState().couponsState.coupons)
-            return unsubscribe;
-        })
     });
+
+    function cancel() {
+        history.push('/company-coupons');
+    }
 
     return (
         <div className="AddCoupon Box1">
@@ -158,7 +141,7 @@ function AddCoupon(): JSX.Element {
                 <span>{errors.companyID?.message}</span>
                 <br /> */}
 
-                <label>Company Id</label> <br />
+                <label className="labelAdd">Company Id</label>
                 <input
                     id="outlined-textarea-1"
                     type="number"
@@ -177,6 +160,7 @@ function AddCoupon(): JSX.Element {
                 <FormControl className={classes.formControl} {...register("category", { required: { value: true, message: 'Missing Category' } })}>
                     <InputLabel id="demo-controlled-open-select-label">Category</InputLabel>
                     <Select
+                        className="selectCategory"
                         labelId="category"
                         id="category"
                         value={type}
@@ -198,6 +182,8 @@ function AddCoupon(): JSX.Element {
                 <br />
                 <span>{errors.category?.message}</span>
                 <br />
+                <br />
+
 
                 {/* public title ? : string; */}
                 <TextField
@@ -216,6 +202,7 @@ function AddCoupon(): JSX.Element {
                 />
                 <br />
                 <span>{errors.title?.message}</span>
+                <br />
                 <br />
 
                 {/* public description ? : string; */}
@@ -319,6 +306,7 @@ function AddCoupon(): JSX.Element {
                 <br />
                 <span>{errors.endDate?.message}</span>
                 <br />
+                <br />
 
                 {/* public amount ? : number; */}
                 <TextField
@@ -336,6 +324,7 @@ function AddCoupon(): JSX.Element {
                 />
                 <br />
                 <span>{errors.amount?.message}</span>
+                <br />
                 <br />
 
                 {/* public price ? : number; */}
@@ -355,6 +344,7 @@ function AddCoupon(): JSX.Element {
                 />
                 <br />
                 <span>{errors.price?.message}</span>
+                <br />
                 <br />
 
                 {/* public image ? : string; */}
@@ -376,7 +366,7 @@ function AddCoupon(): JSX.Element {
                 <span>{errors.price?.message}</span>
                 <br /> */}
 
-                <label>Image</label> <br />
+                <label className="labelAdd">Image</label>
                 <input
                     id="outlined-textarea-8"
                     type="text"
@@ -391,10 +381,12 @@ function AddCoupon(): JSX.Element {
                 <br />
                 <span>{errors.price?.message}</span>
                 <br />
-
-                {/* <input type="submit" disabled={!isDirty || !isValid} value="Register" /> */}
-                <Button variant="contained" type="submit" color="primary" value="Register" disabled={!isDirty || !isValid}>Add Coupon</Button>
                 <br />
+
+                <ButtonGroup variant="contained" fullWidth>
+                    <Button color="primary" disabled={!isDirty || !isValid} type="submit" value="create">Add Coupon</Button>
+                    <Button color="secondary" onClick={cancel}>Cancel</Button>
+                </ButtonGroup>
 
             </form>
 

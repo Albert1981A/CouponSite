@@ -1,5 +1,5 @@
 import { Box, Button, ButtonGroup, Grid, Typography } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Unsubscribe } from "redux";
 import CustomerModel from "../../../Models/CustomerModel";
@@ -16,8 +16,6 @@ function AdminCustomers(props: {}): JSX.Element {
 
     const history = useHistory();
 
-    // const [request, setRequest] = useState("");
-
     const [customers, setCustomers] = useState(
         store.getState().customersState.customers
     );
@@ -31,7 +29,6 @@ function AdminCustomers(props: {}): JSX.Element {
                     setCustomers(store.getState().customersState.customers); // updating the local state
                 }
             } catch (err) {
-                // alert(err.message);
                 notify.error(ErrMsg.ERROR_GETTING_CUSTOMERS);
                 notify.error(err);
             }
@@ -43,35 +40,60 @@ function AdminCustomers(props: {}): JSX.Element {
             notify.error(ErrMsg.PLS_LOGIN);
             history.push("/login");
         } else if (store.getState().authState.user.clientType !== "ADMINISTRATOR") {
-            notify.error(ErrMsg.ONLY_COMPANY_ALLOWED);
+            notify.error(ErrMsg.ONLY_ADMIN_ALLOWED);
             history.push("/home");
         }
 
-        let subscription: Unsubscribe;
-
         asyncCustomersFunction();
-        subscription = store.subscribe(() => {
-            setCustomers(store.getState().customersState.customers);
-        });
 
+        let subscription: Unsubscribe;
+        subscription = store.subscribe(() => {
+            setCustomers(store.getState().customersState.customers); // Will let us notify
+        });
         return () => {
             function unsubscribe() {
                 subscription = store.subscribe(() => {
-                    setCustomers(store.getState().customersState.customers);
+                    setCustomers(store.getState().customersState.customers); // Will let us notify
                 });
             }
             unsubscribe();
         };
+        // let unsubscribe: Unsubscribe;
+        // unsubscribe = store.subscribe(() => {
+        //     setCustomers(store.getState().customersState.customers); // Will let us notify
+        // });
+        // return () => {
+        //     unsubscribe();
+        // };
     });
 
-    function GetAllCompanies() {
-        // setRequest("Companies");
+    const [txt, setTxt] = useState<string>("");
+
+    const insertId = (args: SyntheticEvent) => {
+        // args        => information about the Event
+        // args.target => the tag that raised the Event
+        const value = (args.target as HTMLInputElement).value;
+        setTxt(value);
+    }
+
+    async function getSingleCustomer() {
+        if (!customers.find((c) => c.id === parseInt(txt))) {
+            notify.error(ErrMsg.NO_COMPANY_BY_THIS_ID);
+        } else {
+            history.push("/customer-card-details/" + txt);
+        }
+    }
+
+    function getAllCompanies() {
         history.push("/admin-companies");
     }
 
-    function GetAllCustomers() {
-        // setRequest("Customers");
+    function getAllCustomers() {
         history.push("/admin-customers");
+    }
+
+    function addCustomer() {
+        history.push("/admin-add-customer");
     }
 
     return (
@@ -85,13 +107,24 @@ function AdminCustomers(props: {}): JSX.Element {
                 <div className="topButtonsGroup">
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
-                        <Button color="primary" onClick={GetAllCompanies}>
+                        <Button color="primary" onClick={getAllCompanies}>
                             All Companies
                         </Button>
 
-                        <Button color="primary" onClick={GetAllCustomers}>
+                        <Button color="primary" onClick={getAllCustomers}>
                             All Customers
                         </Button>
+
+                        <Button color="primary" onClick={addCustomer}>
+                            Add Customer
+                        </Button>
+
+                        <Button color="primary" onClick={getSingleCustomer} value={txt}>
+                            Get Single Customer by id:
+                        </Button>
+
+                        <input className="inputId" type="text" onChange={insertId} value={txt} />
+
 
                     </ButtonGroup>
                 </div>

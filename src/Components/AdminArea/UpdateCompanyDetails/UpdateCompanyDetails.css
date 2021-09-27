@@ -1,3 +1,30 @@
 .UpdateCompanyDetails {
-	
+	align-items: center;
+    background-color: aliceblue;
+    color: #00897b;
+    border-color: #00897b;
+}
+
+.UpdateCompanyDetails label{
+    font-size: 18px;
+    color:#00897b;
+}
+
+.errorMessage{
+    color:red;
+}
+
+.UpdateCompanyDetails input{    
+    width: 250px;
+    height: 30px;
+}
+
+.UpdateCompanyDetails select{    
+    width: 250px;
+    height: 30px;
+}
+
+.UpdateCompanyDetails > form{
+    text-align: center;
+    align-items: flex-start;
 }

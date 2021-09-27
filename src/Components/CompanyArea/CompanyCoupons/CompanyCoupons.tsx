@@ -1,6 +1,7 @@
-import { Box, Button, ButtonGroup, Grid, Link, ThemeProvider, Typography, unsupportedProp, useTheme } from "@material-ui/core";
+import { Box, Button, ButtonGroup, Grid, InputLabel, Link, Select, ThemeProvider, Typography, unsupportedProp, useTheme } from "@material-ui/core";
 import axios from "axios";
 import { count } from "console";
+import React from "react";
 import { Component, useEffect, useRef, useState } from "react";
 import { NavLink, useHistory } from "react-router-dom";
 import { Unsubscribe } from "redux";
@@ -19,6 +20,11 @@ function CompanyCoupons(props: {}): JSX.Element {
 
     let unsubscribe: Unsubscribe;
     const history = useHistory();
+
+    const [type, setType] = React.useState<string | string>('');
+    const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        setType(event.target.value as string);
+    };
 
     const [coupons, setCoupons] = useState(
         store.getState().couponsState.coupons
@@ -87,8 +93,27 @@ function CompanyCoupons(props: {}): JSX.Element {
                         </Button>
 
                         <Button color="primary" onClick={handleClick2}>
-                            Coupon list
+                            Coupons Of Specific Category
                         </Button>
+
+                        <Select
+                            className="selectCategory"
+                            labelId="category"
+                            id="category"
+                            value={type}
+                            onChange={handleChange}
+                            name="category"
+                        >
+                            <option value="">None</option>
+                            <option value="FOOD_PRODUCTS">Food products</option>
+                            <option value="ELECTRICAL_PRODUCTS">Electrical products</option>
+                            <option value="HOUSEHOLD_PRODUCTS">Household products</option>
+                            <option value="GARDEN_PRODUCTS">Garden products</option>
+                            <option value="RESTAURANTS">Restaurants</option>
+                            <option value="VACATIONS_ABROAD">Vacations abroad</option>
+                            <option value="VACATIONS_IN_ISRAEL">Vacations in israel</option>
+                            <option value="ENTRANCES_TO_SITES_AND_MUSEUMS">Entrances to sites and museums</option>
+                        </Select>
 
                     </ButtonGroup>
                 </div>

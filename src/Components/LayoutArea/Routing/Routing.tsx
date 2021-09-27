@@ -1,4 +1,6 @@
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+import AdminAddCompany from "../../AdminArea/AdminAddCompany/AdminAddCompany";
+import AdminAddCustomer from "../../AdminArea/AdminAddCustomer/AdminAddCustomer";
 import AdminCompanies from "../../AdminArea/AdminCompanies/AdminCompanies";
 import AdminCustomers from "../../AdminArea/AdminCustomers/AdminCustomers";
 import AdminSpace from "../../AdminArea/AdminSpace/AdminSpace";
@@ -40,6 +42,8 @@ function Routing(): JSX.Element {
                 <Route path="/admin-space" component={AdminSpace} exact />
                 <Route path="/admin-companies" component={AdminCompanies} exact />
                 <Route path="/admin-customers" component={AdminCustomers} exact />
+                <Route path="/admin-add-company" component={AdminAddCompany} exact />
+                <Route path="/admin-add-customer" component={AdminAddCustomer} exact />
                 <Route path="/update-company-details/:id" component={UpdateCompanyDetails} exact />
                 <Route path="/update-customer-details/:id" component={UpdateCustomerDetails} exact />
                 <Route path="/add-coupon" component={AddCoupon} exact />

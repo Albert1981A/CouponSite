@@ -1,4 +1,4 @@
-import { Button, createStyles, FormHelperText, InputLabel, makeStyles, MenuItem, NativeSelect, Select, TextField, Theme, ThemeProvider, Typography, useTheme } from "@material-ui/core";
+import { Button, ButtonGroup, createStyles, FormHelperText, InputLabel, makeStyles, MenuItem, NativeSelect, Select, TextField, Theme, ThemeProvider, Typography, useTheme } from "@material-ui/core";
 import FormControl from '@material-ui/core/FormControl';
 import axios from "axios";
 import React from "react";
@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: Theme) =>
         root: {
             '& .MuiTextField-root': {
                 margin: theme.spacing(1),
-                width: '25ch',
+                width: '40ch',
             },
         },
         formControl: {
@@ -57,6 +57,10 @@ function Register(): JSX.Element {
         }
     }
 
+    function cancel() {
+        history.push('/home');
+    }
+
     return (
         <div className="Register Box1">
 
@@ -77,13 +81,15 @@ function Register(): JSX.Element {
                     multiline
                     variant="outlined"
                     {...register("clientName", {
-                        required: { value: true, message: 'Missing Name' },
-                        maxLength: { value: 10, message: 'First name is limit upto 10 Characters' }
+                        required: { value: true, message: 'Missing name' },
+                        maxLength: { value: 40, message: 'Name is limit upto 40 Characters!' },
+                        minLength: { value: 2, message: 'Minimum length of 2 Characters!' }
                     })}
                 />
                 <br />
-                <span>{errors.clientName?.message}</span>
+                <span className="errorMessage">{errors.clientName?.message}</span>
                 <br />
+
                 <TextField
                     id="outlined-textarea-2"
                     type="text"
@@ -93,29 +99,41 @@ function Register(): JSX.Element {
                     multiline
                     variant="outlined"
                     {...register("clientEmail", {
-                        required: { value: true, message: 'Missing Email' },
-                        pattern: { value: /^\S+@\S+$/i, message: 'Invalid Email' }
+                        required: { value: true, message: 'Missing email!' },
+                        maxLength: { value: 60, message: 'Email is limit upto 40 Characters!' },
+                        minLength: { value: 2, message: 'Minimum length of 2 Characters!' },
+                        pattern: { value: /^\S+@\S+$/i, message: 'Invalid email!' }
                     })}
                 />
                 <br />
-                <span>{errors.clientEmail?.message}</span>
+                <span className="errorMessage">{errors.clientEmail?.message}</span>
                 <br />
-                <TextField
-                    id="outlined-textarea-3"
-                    type="text"
-                    name="clientType"
-                    label="Type"
-                    placeholder="Type"
-                    multiline
-                    variant="outlined"
-                    {...register("clientType", {
-                        required: { value: true, message: 'Missing Type' }
-                    })}
-                />
 
-                {/* <input type="submit" disabled={!isDirty || !isValid} value="Register" /> */}
-                <Button variant="contained" type="submit" color="primary" disabled={!isDirty || !isValid} value="Register" >Register</Button>
-
+                <FormControl className={classes.formControl} {...register("clientType", { required: { value: true, message: 'Missing Category' } })}>
+                    <InputLabel id="demo-controlled-open-select-label">Client Type</InputLabel>
+                    <Select
+                        className="selectCategory"
+                        labelId="clientType"
+                        id="clientType"
+                        value={type}
+                        onChange={handleChange}
+                        name="clientType"
+                    >
+                        <option value="">None</option>
+                        <option value="COMPANY">COMPANY</option>
+                        <option value="CUSTOMER">CUSTOMER</option>
+                        <option value="ADMINISTRATOR">ADMINISTRATOR</option>
+                    </Select>
+                </FormControl>
+                <br />
+                <span className="errorMessage">{errors.clientType?.message}</span>
+                <br />
+                
+                <ButtonGroup variant="contained" fullWidth>
+                    <Button color="primary" disabled={!isDirty || !isValid} type="submit" value="Register">Register</Button>
+                    <Button color="secondary" onClick={cancel}>Cancel</Button>
+                </ButtonGroup>
+                
             </form>
         </div>
     );
@@ -123,7 +141,4 @@ function Register(): JSX.Element {
 
 export default Register;
 
-// function setValue(value: string) {
-//     throw new Error("Function not implemented.");
-// }
 

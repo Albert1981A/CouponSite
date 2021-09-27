@@ -15,12 +15,13 @@ import { DateRangeRounded } from "@material-ui/icons";
 import moment from 'moment'
 import axios from "axios";
 import globals from "../../../Service/Globals";
-import { couponsDeletedAction } from "../../../Redux/CouponsState";
+import { allCouponsDeletedAction, couponsAddedAction, couponsDeletedAction } from "../../../Redux/CouponsState";
 import store from "../../../Redux/Store";
 import tokenAxios from "../../../Service/InterceptorAxios";
 import { NavLink, useHistory } from "react-router-dom";
 import notify, { ErrMsg } from "../../../Service/Notification";
 import { Unsubscribe } from "redux";
+import CouponsModel from "../../../Models/CouponModel";
 
 interface CardProps {
     coupon: CouponModel;
@@ -74,6 +75,7 @@ function CompanyCard(_props: CardProps): JSX.Element {
             try {
                 const response = await tokenAxios.delete<any>(globals.urls.company + "coupons/" + id);
                 store.dispatch(couponsDeletedAction(id)); // updating AppState (global state)
+                store.dispatch(allCouponsDeletedAction(id));
             } catch (err) {
                 // alert(err.message);
                 notify.error(ErrMsg.ERROR_GETTING_COUPONS);
@@ -82,14 +84,27 @@ function CompanyCard(_props: CardProps): JSX.Element {
         }
     }
 
-    function purchaseCoupon(id: number): void {
+    async function purchaseCoupon(coupon: CouponModel): Promise<void> {
         if (!store.getState().authState.user) {
             notify.error(ErrMsg.PLS_LOGIN);
             history.push("/login")
-        } else if (store.getState().authState.user.clientType === "CUSTOMER") {
-            history.push("/purchase-coupon/" + id);
-        } else {
+        } else if (store.getState().authState.user?.clientType !== "CUSTOMER") {
             notify.error(ErrMsg.ONLY_CUSTOMER_ALLOWED);
+        } else if (store.getState().couponsState.coupons.find((c) => c.id === prop1.id)) {
+            notify.error(ErrMsg.ALREADY_OWN_THIS_COUPON);
+        } else {
+            const result = window.confirm("Are you sure you want to add coupon id - " + prop1.id + "?");
+            if (result) {
+                try {
+                    const response = await tokenAxios.post<CouponsModel>(globals.urls.customer + "coupons", coupon);
+                    store.dispatch(couponsAddedAction(response.data)); // updating AppState (global state)
+                    history.push("/customer-coupons");
+                } catch (err) {
+                    // alert(err.message);
+                    notify.error(ErrMsg.ERROR_DELETING_COUPON);
+                    notify.error(err);
+                }
+            }
         }
     }
 
@@ -147,7 +162,7 @@ function CompanyCard(_props: CardProps): JSX.Element {
                         <div>
                             <p>Operations:</p>
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
-                                <Button onClick={() => purchaseCoupon(prop1.id)}>Purchase</Button>
+                                <Button onClick={() => purchaseCoupon(prop1)}>Purchase</Button>
                             </ButtonGroup>
                         </div>
                     }
@@ -175,7 +190,7 @@ function CompanyCard(_props: CardProps): JSX.Element {
                         <div>
                             <p>Operations:</p>
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
-                                <Button onClick={() => purchaseCoupon(prop1.id)}>Purchase</Button>
+                                <Button onClick={() => purchaseCoupon(prop1)}>Purchase</Button>
                             </ButtonGroup>
                         </div>
                     }

@@ -6,6 +6,18 @@
 }
 
 .AddCoupon input{    
-    width: 200px;
-    height: 30px;
+    width: 310px;
+    height: 50px;
+}
+
+.labelAdd{  
+    display: flex;
+    margin-left: 15px;
+    margin-bottom: 10px;
+    font-size: 18px;
+    color:dimgray;
+}
+
+.selectCategory {
+    width: 310px;
 }
