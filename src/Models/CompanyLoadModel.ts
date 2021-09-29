@@ -3,7 +3,7 @@ class CompanyModel {
     public name ? : string;
     public email ? : string;
     public password ? : string;
-    public image ? : string;
+    public image ? : FileList;
 }
 
 export default CompanyModel;

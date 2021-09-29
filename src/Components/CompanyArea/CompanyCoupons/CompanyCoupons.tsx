@@ -1,7 +1,7 @@
 import { Box, Button, ButtonGroup, Grid, InputLabel, Link, Select, ThemeProvider, Typography, unsupportedProp, useTheme } from "@material-ui/core";
 import axios from "axios";
 import { count } from "console";
-import React from "react";
+import React, { SyntheticEvent } from "react";
 import { Component, useEffect, useRef, useState } from "react";
 import { NavLink, useHistory } from "react-router-dom";
 import { Unsubscribe } from "redux";
@@ -30,6 +30,38 @@ function CompanyCoupons(props: {}): JSX.Element {
         store.getState().couponsState.coupons
     );
 
+    async function asyncFunction() {
+        if (coupons.length === 0) {
+            try {
+                // console.log("Hi... Im here 1");
+                const response = await tokenAxios.get<CouponsModel[]>(globals.urls.company + "coupons");
+                if (response.data.length !== 0) {
+                    store.dispatch(couponsDownloadedAction(response.data)); // updating AppState (global state)
+                    setCoupons(store.getState().couponsState.coupons); // updating the local state
+                    // console.log("Hi... Im here 2");
+                }
+            } catch (err) {
+                notify.error(ErrMsg.ERROR_GETTING_COUPONS);
+                notify.error(err);
+            }
+        }
+    }
+
+    async function asyncFunction2() {
+        try {
+            // console.log("Hi... Im here 1");
+            const response = await tokenAxios.get<CouponsModel[]>(globals.urls.company + "coupons");
+            if (response.data.length !== 0) {
+                store.dispatch(couponsDownloadedAction(response.data)); // updating AppState (global state)
+                setCoupons(store.getState().couponsState.coupons); // updating the local state
+                // console.log("Hi... Im here 2");
+            }
+        } catch (err) {
+            notify.error(ErrMsg.ERROR_GETTING_COUPONS);
+            notify.error(err);
+        }
+    }
+
     useEffect(() => {
         if (!store.getState().authState.user) {
             notify.error(ErrMsg.PLS_LOGIN);
@@ -40,23 +72,6 @@ function CompanyCoupons(props: {}): JSX.Element {
         } else {
             asyncFunction();
             console.log("Hi... Im here 4");
-        }
-        async function asyncFunction() {
-            if (coupons.length === 0) {
-                try {
-                    console.log("Hi... Im here 1");
-                    const response = await tokenAxios.get<CouponsModel[]>(globals.urls.company + "coupons");
-                    if (response.data.length !== 0) {
-                        store.dispatch(couponsDownloadedAction(response.data)); // updating AppState (global state)
-                        setCoupons(store.getState().couponsState.coupons); // updating the local state
-                        console.log("Hi... Im here 2");
-                    }
-                } catch (err) {
-                    // alert(err.message);
-                    notify.error(ErrMsg.ERROR_GETTING_COUPONS);
-                    notify.error(err);
-                }
-            }
         }
 
         unsubscribe = store.subscribe(() => {
@@ -69,30 +84,85 @@ function CompanyCoupons(props: {}): JSX.Element {
         };
     });
 
-    function handleClick1(): void {
+    function allCoupons() {
+        asyncFunction2();
+    }
+
+    const [id, setId] = useState<string>("");
+
+    const insertId = (args: SyntheticEvent) => {
+        const value = (args.target as HTMLInputElement).value;
+        setId(value);
+    }
+
+    async function getSingleCoupon() {
+        if (!coupons.find((c) => c.id === parseInt(id))) {
+            notify.error(ErrMsg.NO_COUPON_BY_THIS_ID);
+        } else {
+            history.push("/company-coupon-details/" + id);
+        }
+    }
+
+    const [maxPrice, setMaxPrice] = useState<string>("");
+
+    const insertPrice = (args: SyntheticEvent) => {
+        const value = (args.target as HTMLInputElement).value;
+        setMaxPrice(value);
+    }
+
+    async function findMaxPrice() {
+        if (!coupons.find((c) => c.price < parseInt(maxPrice))) {
+            notify.error(ErrMsg.NO_COUPON_BY_THIS_MAX_PRICE);
+        } else {
+            var rows1: CouponsModel[] = [];
+            for (var i = 0; i < coupons.length; i++) {
+                if (coupons[i].price < parseInt(maxPrice)) {
+                    rows1.push(coupons[i]);
+                }
+                setCoupons(rows1);
+            }
+        }
+    }
+
+    function addCoupon(): void {
         history.push("/add-coupon");
     }
 
-    function handleClick2(): void {
-        history.push("/coupon-list");
+    function specificCategory(): void {
+        if (!coupons.find((c) => c.category === type)) {
+            notify.error(ErrMsg.NO_COUPON_BY_THIS_CATEGORY);
+        } else {
+            var rows: CouponsModel[] = [];
+            for (var i = 0; i < coupons.length; i++) {
+                if (coupons[i].category === type) {
+                    rows.push(coupons[i]);
+                }
+                setCoupons(rows);
+            }
+        }
     }
 
     return (
         <div className="CompanyCoupons">
-
+            <Typography variant="h5" noWrap>
+                <Box className="head1" fontWeight="fontWeightMedium">Company Coupons &nbsp; &nbsp;</Box>
+            </Typography>
+            <br />
             <div className="head2">
-                <Typography variant="h5" noWrap>
-                    <Box className="head1" fontWeight="fontWeightMedium">Company Coupons &nbsp; &nbsp;</Box>
-                </Typography>
 
                 <div className="topButtonsGroup">
+
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
-                        <Button color="primary" onClick={handleClick1}>
+                        <Button color="primary" onClick={addCoupon}>
                             Add Coupon
                         </Button>
 
-                        <Button color="primary" onClick={handleClick2}>
+                        <Button color="primary" onClick={allCoupons}>
+                            All Coupons
+                        </Button>
+
+                        <Button color="primary" onClick={specificCategory}>
                             Coupons Of Specific Category
                         </Button>
 
@@ -114,6 +184,18 @@ function CompanyCoupons(props: {}): JSX.Element {
                             <option value="VACATIONS_IN_ISRAEL">Vacations in israel</option>
                             <option value="ENTRANCES_TO_SITES_AND_MUSEUMS">Entrances to sites and museums</option>
                         </Select>
+
+                        <Button color="primary" onClick={findMaxPrice}>
+                            Coupons Of Max price
+                        </Button>
+
+                        <input className="inputId" type="text" onChange={insertPrice} value={maxPrice} />
+
+                        <Button color="primary" onClick={getSingleCoupon}>
+                            Get Single Coupon by id:
+                        </Button>
+
+                        <input className="inputId" type="text" onChange={insertId} value={id} />
 
                     </ButtonGroup>
                 </div>

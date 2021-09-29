@@ -51,6 +51,13 @@ function Login(): JSX.Element {
     };
 
     const theme = useTheme();
+
+    // useEffect(() => {
+    //     if (store.getState().authState.user) {
+    //         notify.error(ErrMsg.ALREADY_LOGGED_IN);
+    //         history.push("/home");
+    //     } 
+    // });
     
     const { register, handleSubmit, formState: { errors, isDirty, isValid } } = useForm<CredentialsModel>({ mode: "onTouched" });
     const history = useHistory();
@@ -100,14 +107,6 @@ function Login(): JSX.Element {
         }
 
     }
-
-    // useEffect(() => {
-    //     const unsubscribe = store.subscribe(() => {
-    //         setUser(store.getState().authState.user)
-    //         return unsubscribe;
-    //     })
-
-    // });
 
     return (
         <div className="Login Box1">

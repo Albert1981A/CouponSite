@@ -10,13 +10,13 @@ import notify, { SccMsg } from "../../../Service/Notification";
 
 function Logout(): JSX.Element {
 
-    const [logoutDetails, setLogoutDetails] = useState(store.getState().authState.user.clientToken);
+    // const [logoutDetails, setLogoutDetails] = useState(store.getState().authState.user.clientToken);
     const history = useHistory();
     
     async function logoutBack() {
         try {
-            console.log(logoutDetails);
-            console.log(globals.urls.client + "logout");
+            // console.log(logoutDetails);
+            // console.log(globals.urls.client + "logout");
             const response = await tokenAxios.delete(globals.urls.client + "logout");
             store.dispatch(couponsDeleteAllAction());
             console.log(response);

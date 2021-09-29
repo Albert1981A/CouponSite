@@ -66,19 +66,18 @@ function Main(props: {}): JSX.Element {
         <div className="Main">
             
             <div className="head2">
+
                 <Typography variant="h5" noWrap>
-                    <Box className="head1" fontWeight="fontWeightMedium">Main Page: All Coupons &nbsp; &nbsp;</Box>
+                    <Box className="head1" fontWeight="fontWeightMedium">Main Page &nbsp; &nbsp;</Box>
                 </Typography>
 
-                <div className="topButtonsGroup">
+                {/* <div className="topButtonsGroup">
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
-
                         <Button color="primary" onClick={handleClick2}>
                             Coupon list
                         </Button>
-
                     </ButtonGroup>
-                </div>
+                </div> */}
             </div>
 
             <br />

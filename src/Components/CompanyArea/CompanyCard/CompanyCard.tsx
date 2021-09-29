@@ -100,8 +100,7 @@ function CompanyCard(_props: CardProps): JSX.Element {
                     store.dispatch(couponsAddedAction(response.data)); // updating AppState (global state)
                     history.push("/customer-coupons");
                 } catch (err) {
-                    // alert(err.message);
-                    notify.error(ErrMsg.ERROR_DELETING_COUPON);
+                    notify.error(ErrMsg.ERROR_PURCHASING_COUPON);
                     notify.error(err);
                 }
             }

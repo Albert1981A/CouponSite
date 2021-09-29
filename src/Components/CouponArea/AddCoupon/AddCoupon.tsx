@@ -47,13 +47,15 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function AddCoupon(): JSX.Element {
 
+    console.log(store.getState().authState.user);
+
     const history = useHistory();
     const classes = useStyles();
     const [value, setValue] = React.useState('Controlled');
 
     const [type, setType] = React.useState<string | string>('');
     const [open, setOpen] = React.useState(false);
-    const [user, setUser] = React.useState(store.getState().authState.user)
+    const [user, setUser] = React.useState(store.getState().authState.user);
 
     const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         setType(event.target.value as string);

@@ -63,7 +63,8 @@ function UpdateCompanyDetails(props: updateCompanyDetailsProps): JSX.Element {
         if (!store.getState().authState.user) {
             notify.error(ErrMsg.PLS_LOGIN);
             history.push("/login");
-        } else if (store.getState().authState.user.clientType !== "ADMINISTRATOR") {
+        } 
+        else if (store.getState().authState.user.clientType !== "ADMINISTRATOR") {
             notify.error(ErrMsg.ONLY_ADMIN_ALLOWED);
             history.push("/home");
         }

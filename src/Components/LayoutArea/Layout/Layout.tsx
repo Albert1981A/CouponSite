@@ -135,22 +135,24 @@ function Layout(): JSX.Element {
     };
 
     //const { history } = props;
-    const itemList = [{
-        text: 'Register',
-        icon: <PersonAdd style={{ color: teal[600] }} />,
-        link: "/register"
-        // onClick: () => history.push("/register")
-    }, {
-        text: 'Login',
-        icon: <LockOpen style={{ color: teal[600] }} />,
-        link: "/login"
-        //onClick: () => history.push("/login")
-    }, {
-        text: 'Logout',
-        icon: <ExitToApp style={{ color: teal[600] }} />,
-        link: "/logout"
-        //onClick: () => history.push("/logout")
-    }, {
+    const itemList = [
+    //     {
+    //     text: 'Register',
+    //     icon: <PersonAdd style={{ color: teal[600] }} />,
+    //     link: "/register"
+    //     // onClick: () => history.push("/register")
+    // }, {
+    //     text: 'Login',
+    //     icon: <LockOpen style={{ color: teal[600] }} />,
+    //     link: "/login"
+    //     //onClick: () => history.push("/login")
+    // }, {
+    //     text: 'Logout',
+    //     icon: <ExitToApp style={{ color: teal[600] }} />,
+    //     link: "/logout"
+    //     //onClick: () => history.push("/logout")
+    // },
+    {
         text: 'About',
         icon: <Info style={{ color: teal[600] }} />,
         link: "/about"

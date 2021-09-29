@@ -57,8 +57,14 @@ function AdminAddCompany(): JSX.Element {
 
     const { register, handleSubmit, formState: { errors, isDirty, isValid } } = useForm<CompanyLoadModel>({ mode: "onTouched" });
 
-    async function send(companyToSend: CompanyModel) {
-        console.log(companyToSend);
+    async function send(companyToSend: CompanyLoadModel) {
+        
+        // console.log(companyToSend);
+        // console.log(companyToSend.image);
+
+        // var fs = require('fs');
+        // fs.writeFile(`${process.env.PUBLIC_URL}/assets/images/` + companyToSend.image, companyToSend.image, 'binary');
+
         if (store.getState().companiesState.companies.find(c => c.name === companyToSend.name)) {
             notify.error(ErrMsg.COMPANY_NAME_EXIST);
         } else if (store.getState().companiesState.companies.find(c => c.email === companyToSend.email)) {
@@ -82,6 +88,7 @@ function AdminAddCompany(): JSX.Element {
         history.push('/admin-companies');
     }
 
+
     return (
         <div className="AdminAddCompany Box1">
 
@@ -92,11 +99,11 @@ function AdminAddCompany(): JSX.Element {
             </ThemeProvider>
             <br />
 
-            <form className={classes.root} noValidate autoComplete="off" onSubmit={handleSubmit(send)}>
+            <form className={classes.root} noValidate autoComplete="off" onSubmit={handleSubmit(send)} method="post" encType="multipart/form-data">
 
                 {/* public name ? : string NO */}
                 <TextField
-                    id="outlined-textarea-2"
+                    id="new"
                     type="text"
                     name="name"
                     label="Name"
@@ -168,23 +175,16 @@ function AdminAddCompany(): JSX.Element {
                 <br />
                 <br /> */}
 
-
-
-
-                {/* <label for="avatar">Choose a profile picture:</label> */}
-
-                <input type="file"
-                    id="avatar" name="image"
-                    accept="image/png, image/jpeg"
-                    // style={{ display: "none" }}
-                    accessKey={`${process.env.PUBLIC_URL}/assets/images/`}
-                    
-                    // ref={`${process.env.PUBLIC_URL}/assets/images/`}
+                <input
+                    type="file"
+                    id="myFile"
+                    name="profile_pic"
+                    accept=".jpg, .jpeg, .png"
                     {...register("image", {
                         required: { value: true, message: 'Missing image!' },
                         minLength: { value: 2, message: 'Minimum length of 2 Characters!' },
                     })}
-                ></input>
+                />
 
 
 
