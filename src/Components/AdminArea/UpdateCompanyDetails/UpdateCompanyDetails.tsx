@@ -1,4 +1,5 @@
-import { Button, ButtonGroup, createStyles, makeStyles, Theme, ThemeProvider, Typography, useTheme } from "@material-ui/core";
+import { Button, ButtonGroup, createStyles, makeStyles, TextField, Theme, ThemeProvider, Typography, useTheme } from "@material-ui/core";
+import axios, { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { RouteComponentProps, useHistory } from "react-router-dom";
@@ -63,7 +64,7 @@ function UpdateCompanyDetails(props: updateCompanyDetailsProps): JSX.Element {
         if (!store.getState().authState.user) {
             notify.error(ErrMsg.PLS_LOGIN);
             history.push("/login");
-        } 
+        }
         else if (store.getState().authState.user.clientType !== "ADMINISTRATOR") {
             notify.error(ErrMsg.ONLY_ADMIN_ALLOWED);
             history.push("/home");
@@ -76,7 +77,7 @@ function UpdateCompanyDetails(props: updateCompanyDetailsProps): JSX.Element {
 
     async function send(companyToSend: CompanyModel) {
         // companyToSend.id = ((Number)(companyToSend.id));
-        // console.log(companyToSend);
+        console.log(companyToSend);
         // console.log(company);
         if (companyToSend.id != company.id) {
             notify.error(ErrMsg.UNABLE_TO_UPDATE_COMPANY_ID);
@@ -88,13 +89,18 @@ function UpdateCompanyDetails(props: updateCompanyDetailsProps): JSX.Element {
                 const added = response.data;
                 // console.log(added);
                 store.dispatch(companiesUpdatedAction(added));
-                setCompany(store.getState().companiesState.companies.find((c) => c.id === id)); 
+                setCompany(store.getState().companiesState.companies.find((c) => c.id === id));
                 notify.success(SccMsg.UPDATED);
                 history.push('/admin-companies');
             }
             catch (err) {
                 notify.error(ErrMsg.UNABLE_TO_UPDATE_COMPANY);
-                notify.error(err);
+                const err1 = err as AxiosError
+                if (err1.response) {
+                    console.log(err1.response.status)
+                    console.log(err1.response.data)
+                    notify.error(err1);
+                }
             }
         }
     }
@@ -104,7 +110,7 @@ function UpdateCompanyDetails(props: updateCompanyDetailsProps): JSX.Element {
     }
 
     return (
-        <div className="UpdateCompanyDetails">
+        <div className="UpdateCompanyDetails Box1">
 
             <ThemeProvider theme={theme}>
                 <Typography variant="h5" noWrap>
@@ -113,18 +119,20 @@ function UpdateCompanyDetails(props: updateCompanyDetailsProps): JSX.Element {
             </ThemeProvider>
             <br />
 
-            <form className={classes.root} onSubmit={handleSubmit(send)}>
+            <form className={classes.root} noValidate autoComplete="off" onSubmit={handleSubmit(send)}>
 
                 {/* public id ? : number NO*/}
                 <label>Company Id</label> <br />
                 <input
-                    id="outlined-textarea-1"
+                    className="disabledArea1"
+                    id="outlined-textarea-2"
                     type="number"
                     name="id"
-                    placeholder="id"
+                    placeholder="Id"
                     value={company.id}
                     {...register("id", {
-                        required: { value: true, message: 'Missing company id' }
+                        required: { value: true, message: 'Missing company id' },
+                        pattern: { value: /^[0-9]*$/, message: 'Only integers!' }
                     })}
                 />
                 <br />
@@ -134,6 +142,7 @@ function UpdateCompanyDetails(props: updateCompanyDetailsProps): JSX.Element {
                 {/* public name ? : string NO*/}
                 <label>Name</label> <br />
                 <input
+                    className="disabledArea1"
                     id="outlined-textarea-2"
                     type="text"
                     name="name"

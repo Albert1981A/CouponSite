@@ -21,3 +21,7 @@
 .selectCategory {
     width: 310px;
 }
+
+.AddCoupon .disabledArea1 {
+    background-color: rgb(208, 220, 221);
+}

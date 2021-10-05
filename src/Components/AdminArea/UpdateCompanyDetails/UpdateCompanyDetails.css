@@ -28,3 +28,7 @@
     text-align: center;
     align-items: flex-start;
 }
+
+.UpdateCompanyDetails .disabledArea1 {
+    background-color: rgb(208, 220, 221);
+}

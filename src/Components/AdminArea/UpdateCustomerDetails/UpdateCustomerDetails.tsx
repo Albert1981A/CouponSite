@@ -115,13 +115,15 @@ function UpdateCustomerDetails(props: updateCustomerDetailsProps): JSX.Element {
                 {/* public id ? : number NO */}
                 <label>Customer Id</label> <br />
                 <input
+                    className="disabledArea1"
                     id="outlined-textarea-1"
                     type="number"
                     name="id"
                     placeholder="id"
                     value={customer.id}
                     {...register("id", {
-                        required: { value: true, message: 'Missing customer id' }
+                        required: { value: true, message: 'Missing customer id' },
+                        pattern: { value: /^[0-9]*$/, message: 'Only integers!' }
                     })}
                 />
                 <br />

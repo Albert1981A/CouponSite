@@ -44,7 +44,8 @@ export enum ErrMsg {
     NO_COUPON_BY_THIS_ID = "NO_COUPON_BY_THIS_ID",
     NO_COUPON_BY_THIS_CATEGORY = "NO_COUPON_BY_THIS_CATEGORY",
     NO_COUPON_BY_THIS_MAX_PRICE = "NO_COUPON_BY_THIS_MAX_PRICE",
-    ERROR_PURCHASING_COUPON = "ERROR_PURCHASING_COUPON"
+    ERROR_PURCHASING_COUPON = "ERROR_PURCHASING_COUPON",
+    END_DATE_IS_BEFORE_START_DATE = "END_DATE_IS_BEFORE_START_DATE"
 }
 
 class Notify {
@@ -66,6 +67,10 @@ class Notify {
 
         if (typeof err?.response?.data === 'string') { //Backend exact error
             return err.response.data;
+        }
+
+        if (typeof err?.response?.data?.value === 'string') { //Backend exact error
+            return err.response.data.value;
         }
 
         if (Array.isArray(err?.response?.data)) { // Backend exact error list

@@ -20,6 +20,8 @@ import {
 import tokenAxios from "../../../Service/InterceptorAxios";
 import { useState } from "react";
 import { Unsubscribe } from "redux";
+import { error } from "console";
+import { Message } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -65,10 +67,12 @@ function AddCoupon(): JSX.Element {
 
     const { register, handleSubmit, formState: { errors, isDirty, isValid } } = useForm<CouponLoadModel>({ mode: "onTouched" });
 
-    async function send(coupon: CouponLoadModel) {
-        console.log(coupon);
-        if (store.getState().couponsState.coupons.find(c => c.title === coupon.title)) {
+    async function send(couponToSend: CouponLoadModel) {
+        console.log(couponToSend);
+        if (store.getState().couponsState.coupons.find(c => c.title === couponToSend.title)) {
             notify.error(ErrMsg.TITLE_EXIST);
+        } else if (couponToSend.startDate > couponToSend.endDate) {
+            notify.error(ErrMsg.END_DATE_IS_BEFORE_START_DATE);
         } else {
             try {
                 // const formData = new FormData();
@@ -88,7 +92,7 @@ function AddCoupon(): JSX.Element {
                 // const response = await axios.post<CouponModel>(globals.urls.company + "coupons", coupon, { headers });
 
                 // Sending token with interceptor
-                const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", coupon);
+                const response = await tokenAxios.post<CouponModel>(globals.urls.company + "coupons", couponToSend);
                 const added = response.data;
                 console.log(added);
                 store.dispatch(couponsAddedAction(added));
@@ -145,13 +149,15 @@ function AddCoupon(): JSX.Element {
 
                 <label className="labelAdd">Company Id</label>
                 <input
+                    className="disabledArea1"
                     id="outlined-textarea-1"
                     type="number"
                     name="company id"
                     placeholder="Company ID"
                     value={user.clientId}
                     {...register("companyID", {
-                        required: { value: true, message: 'Missing company id' }
+                        required: { value: true, message: 'Missing company id' },
+                        pattern: { value: /^[0-9]*$/, message: 'Only integers!' }
                     })}
                 />
                 <br />
@@ -218,7 +224,7 @@ function AddCoupon(): JSX.Element {
                     variant="outlined"
                     {...register("description", {
                         required: { value: true, message: 'Missing description!' },
-                        maxLength: { value: 400, message: 'Title is limit upto 400 Characters!' },
+                        maxLength: { value: 400, message: 'Description is limit upto 400 Characters!' },
                         minLength: { value: 2, message: 'Minimum length of 2 Characters!' }
                         // ,pattern: { value: /^\S+@\S+$/i, message: 'Invalid Email' }
                     })}
@@ -252,7 +258,7 @@ function AddCoupon(): JSX.Element {
                     </Grid>
                 </MuiPickersUtilsProvider> */}
                 <TextField
-                    id="date"
+                    id="startDate1"
                     label="Start Date"
                     type="date"
                     name="startDate"
@@ -293,7 +299,7 @@ function AddCoupon(): JSX.Element {
                     </Grid>
                 </MuiPickersUtilsProvider> */}
                 <TextField
-                    id="date"
+                    id="endDate1"
                     label="End Date"
                     type="date"
                     name="endDate"
@@ -321,7 +327,8 @@ function AddCoupon(): JSX.Element {
                     variant="outlined"
                     {...register("amount", {
                         required: { value: true, message: 'Missing amount!' },
-                        min: { value: 1, message: "Weight must be grater than zero!" }
+                        min: { value: 1, message: "Amount must be grater than zero!" },
+                        pattern: { value: /^[0-9]*$/, message: 'Only integers!' }
                     })}
                 />
                 <br />
@@ -341,7 +348,8 @@ function AddCoupon(): JSX.Element {
                     variant="outlined"
                     {...register("price", {
                         required: { value: true, message: 'Missing price!' },
-                        min: { value: 1, message: "Weight must be grater than zero!" }
+                        min: { value: 1, message: "Price must be grater than zero!" },
+                        pattern: { value: /^-?[0-9]\d*\.?\d*$/, message: 'Only numbers!' }
                     })}
                 />
                 <br />
@@ -370,6 +378,7 @@ function AddCoupon(): JSX.Element {
 
                 <label className="labelAdd">Image</label>
                 <input
+                    className="disabledArea1"
                     id="outlined-textarea-8"
                     type="text"
                     name="image"

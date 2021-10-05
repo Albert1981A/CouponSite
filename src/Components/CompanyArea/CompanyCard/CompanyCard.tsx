@@ -8,7 +8,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import { ButtonGroup } from "@material-ui/core";
+import { ButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, PaperProps } from "@material-ui/core";
 import CouponModel from "../../../Models/CouponModel";
 import CompanyModel from "../../../Models/CompanyModel";
 import { DateRangeRounded } from "@material-ui/icons";
@@ -22,6 +22,18 @@ import { NavLink, useHistory } from "react-router-dom";
 import notify, { ErrMsg } from "../../../Service/Notification";
 import { Unsubscribe } from "redux";
 import CouponsModel from "../../../Models/CouponModel";
+import Draggable from "react-draggable";
+
+function PaperComponent(props: PaperProps) {
+    return (
+        <Draggable
+            handle="#draggable-dialog-title"
+            cancel={'[class*="MuiDialogContent-root"]'}
+        >
+            <Paper {...props} />
+        </Draggable>
+    );
+}
 
 interface CardProps {
     coupon: CouponModel;
@@ -74,17 +86,27 @@ function CompanyCard(_props: CardProps): JSX.Element {
         if (result) {
             try {
                 const response = await tokenAxios.delete<any>(globals.urls.company + "coupons/" + id);
-                store.dispatch(couponsDeletedAction(id)); // updating AppState (global state)
+                store.dispatch(couponsDeletedAction(id)); 
                 store.dispatch(allCouponsDeletedAction(id));
             } catch (err) {
-                // alert(err.message);
                 notify.error(ErrMsg.ERROR_GETTING_COUPONS);
                 notify.error(err);
             }
         }
     }
 
+    const [open, setOpen] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     async function purchaseCoupon(coupon: CouponModel): Promise<void> {
+        setOpen(false);
         if (!store.getState().authState.user) {
             notify.error(ErrMsg.PLS_LOGIN);
             history.push("/login")
@@ -93,16 +115,14 @@ function CompanyCard(_props: CardProps): JSX.Element {
         } else if (store.getState().couponsState.coupons.find((c) => c.id === prop1.id)) {
             notify.error(ErrMsg.ALREADY_OWN_THIS_COUPON);
         } else {
-            const result = window.confirm("Are you sure you want to add coupon id - " + prop1.id + "?");
-            if (result) {
-                try {
-                    const response = await tokenAxios.post<CouponsModel>(globals.urls.customer + "coupons", coupon);
-                    store.dispatch(couponsAddedAction(response.data)); // updating AppState (global state)
-                    history.push("/customer-coupons");
-                } catch (err) {
-                    notify.error(ErrMsg.ERROR_PURCHASING_COUPON);
-                    notify.error(err);
-                }
+            try {
+                const response = await tokenAxios.post<CouponsModel>(globals.urls.customer + "coupons", coupon);
+                console.log(response.data);
+                store.dispatch(couponsAddedAction(response.data)); // updating AppState (global state)
+                history.push("/customer-coupons");
+            } catch (err) {
+                notify.error(ErrMsg.ERROR_PURCHASING_COUPON);
+                notify.error(err);
             }
         }
     }
@@ -122,8 +142,6 @@ function CompanyCard(_props: CardProps): JSX.Element {
     return (
         <div className="CompanyCard">
             <Card className={classes.root}>
-
-                {/* <NavLink className="navLink" to={"/company-coupon-details/" + prop1.id} exact> */}
 
                 <CardActionArea onClick={navTo}>
 
@@ -153,7 +171,6 @@ function CompanyCard(_props: CardProps): JSX.Element {
 
                 </CardActionArea>
 
-                {/* </NavLink> */}
 
                 <CardActions>
 
@@ -162,6 +179,9 @@ function CompanyCard(_props: CardProps): JSX.Element {
                             <p>Operations:</p>
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
                                 <Button onClick={() => purchaseCoupon(prop1)}>Purchase</Button>
+                                {/* <Button variant="outlined" onClick={handleClickOpen}>
+                                Purchase
+                            </Button> */}
                             </ButtonGroup>
                         </div>
                     }
@@ -189,8 +209,32 @@ function CompanyCard(_props: CardProps): JSX.Element {
                         <div>
                             <p>Operations:</p>
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
-                                <Button onClick={() => purchaseCoupon(prop1)}>Purchase</Button>
+                                {/* <Button onClick={() => purchaseCoupon(prop1)}>Purchase</Button> */}
+                                <Button onClick={handleClickOpen}>Purchase</Button>
+
                             </ButtonGroup>
+
+                            <Dialog
+                                open={open}
+                                onClose={handleClose}
+                                PaperComponent={PaperComponent}
+                                aria-labelledby="draggable-dialog-title"
+                            >
+                                <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
+                                    Purchase coupon
+                                </DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText>
+                                        Are you sure you want to add coupon id - {prop1.id} ?
+                                    </DialogContentText>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button autoFocus onClick={handleClose}>
+                                        Cancel
+                                    </Button>
+                                    <Button onClick={() => purchaseCoupon(prop1)}>Purchase</Button>
+                                </DialogActions>
+                            </Dialog>
                         </div>
                     }
 

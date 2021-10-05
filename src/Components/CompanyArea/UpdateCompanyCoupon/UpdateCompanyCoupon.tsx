@@ -1,5 +1,7 @@
 import { Button, ButtonGroup, createStyles, FormControl, Input, InputLabel, makeStyles, Select, Step, TextField, Theme, ThemeProvider, Typography, useTheme } from "@material-ui/core";
 import { InputOutlined, Label, PowerInputOutlined } from "@material-ui/icons";
+import axios, { AxiosError } from "axios";
+import { promises } from "dns";
 import React from "react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -40,9 +42,9 @@ interface RouteParam {
     id: string;
 }
 
-interface updateCouponDetailsProps extends RouteComponentProps<RouteParam> { }
+interface updateCompanyCouponProps extends RouteComponentProps<RouteParam> { }
 
-function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
+function UpdateCompanyCoupon(props: updateCompanyCouponProps): JSX.Element {
 
     const history = useHistory(); //Redirect function
 
@@ -66,7 +68,7 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
     const theme = useTheme();
 
     const { register, handleSubmit, formState: { errors, isDirty, isValid } } = useForm<CouponModel>({
-        mode: "onChange"
+        mode: "onTouched"
     });
 
     const id = +props.match.params.id;
@@ -89,21 +91,28 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
         // };
     });
 
-    async function send(couponToSend: CouponModel) {
-        // console.log(couponToSend);
-        // console.log(coupon);
-        try {
-            const response = await tokenAxios.put<CouponModel>(globals.urls.company + "coupons", couponToSend);
-            const added = response.data;
-            // console.log(added);
-            store.dispatch(couponsUpdatedAction(added)); //With Redux
-            store.dispatch(allCouponsUpdatedAction(added));
-            notify.success(SccMsg.UPDATE_COUPON)
-            history.push('/company-coupons')
-        }
-        catch (err) {
-            notify.error(ErrMsg.UPDATE_COUPON);
-            notify.error(err);
+    async function send(couponToSend2: CouponModel) {
+        // console.log(couponToSend2);
+        if (store.getState().couponsState.coupons.find(c => c.title === couponToSend2.title) &&
+            coupon.title !== couponToSend2.title) {
+            notify.error(ErrMsg.TITLE_EXIST);
+        } else if (couponToSend2.startDate > couponToSend2.endDate) {
+            notify.error(ErrMsg.END_DATE_IS_BEFORE_START_DATE);
+        } else {
+            try {
+                const response = await tokenAxios.put<CouponModel>(globals.urls.company + "coupons", couponToSend2);
+                const added = response.data;
+                // console.log(added);
+                store.dispatch(couponsUpdatedAction(added)); //With Redux
+                store.dispatch(allCouponsUpdatedAction(added));
+                notify.success(SccMsg.UPDATE_COUPON)
+                history.push('/company-coupons')
+                // await axios.get('/bad-call');
+            }
+            catch (err: any) {
+                notify.error(ErrMsg.UPDATE_COUPON);
+                notify.error(err);
+            }
         }
     }
 
@@ -120,19 +129,6 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
         return newDate;
     }
 
-    // const [couponId, setCouponId] = useState(coupon.id);
-    // const [companyId, setCompanyId] = useState(coupon.companyID);
-    // const [category, setCategory] = useState(coupon.category);
-    // const [title, setTitle] = useState(coupon.title);
-    // const [description, setDescription] = useState(coupon.description);
-    // const [startDate, setStartDate] = useState(getDate(coupon.startDate));
-    // const [endDate, setEndDate] = useState(getDate(coupon.endDate));
-    // const [amount, setAmount] = useState(coupon.amount);
-    // const [price, setPrice] = useState(coupon.price);
-    // const [image, setImage] = useState(coupon.image);
-
-
-
     return (
         <div className="UpdateCompanyCoupon Box1">
 
@@ -143,7 +139,7 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
             </ThemeProvider>
             <br />
 
-            <form className={classes.root} onSubmit={handleSubmit(send)}>
+            <form className={classes.root} noValidate autoComplete="off" onSubmit={handleSubmit(send)}>
 
                 {/* public coupon id ? : number; */}
                 {/* <TextField
@@ -161,7 +157,8 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
                         }}
                     value={couponId}
                     {...register("id", {
-                        required: { value: true, message: 'Missing company id' }
+                        required: { value: true, message: 'Missing company id' },
+                        pattern: { value: /^\d*\.?\d*$/, message: 'Invalid email!' }
                     })}
                 />
                 <br />
@@ -170,13 +167,15 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
 
                 <label>Coupon Id</label> <br />
                 <input
+                    className="disabledArea1"
                     id="outlined-textarea-1"
                     type="number"
                     name="id"
                     placeholder="id"
                     value={coupon.id}
                     {...register("id", {
-                        required: { value: true, message: 'Missing company id' }
+                        required: { value: true, message: 'Missing company id' },
+                        pattern: { value: /^[0-9]*$/, message: 'Only integers!' }
                     })}
                 />
                 <br />
@@ -199,7 +198,8 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
                     }}
                     value={companyId}
                     {...register("companyID", {
-                        required: { value: true, message: 'Missing company id' }
+                        required: { value: true, message: 'Missing company id' },
+                        pattern: { value: /^[0-9]*$/, message: 'Only integers!' }
                     })}
                 />
                 <br />
@@ -208,13 +208,15 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
 
                 <label>Company Id</label> <br />
                 <input
+                    className="disabledArea1"
                     id="outlined-textarea-1"
                     type="number"
                     name="company id"
                     placeholder="Company ID"
                     value={coupon.companyID}
                     {...register("companyID", {
-                        required: { value: true, message: 'Missing company id' }
+                        required: { value: true, message: 'Missing company id' },
+                        pattern: { value: /^[0-9]*$/, message: 'Only integers!' }
                     })}
                 />
                 <br />
@@ -357,7 +359,7 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
                     defaultValue={coupon.description}
                     {...register("description", {
                         required: { value: true, message: 'Missing description' },
-                        maxLength: { value: 400, message: 'Title is limit upto 400 Characters!' },
+                        maxLength: { value: 400, message: 'Description is limit upto 400 Characters!' },
                         minLength: { value: 2, message: 'Minimum length of 2 Characters!' }
                         // ,pattern: { value: /^\S+@\S+$/i, message: 'Invalid Email' }
                     })}
@@ -477,7 +479,8 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
                     defaultValue={coupon.amount}
                     {...register("amount", {
                         required: { value: true, message: 'Missing amount!' },
-                        min: { value: 1, message: "Price must be grater than zero!" }
+                        min: { value: 1, message: "Price must be grater than zero!" },
+                        pattern: { value: /^[0-9]*$/, message: 'Only integers!' }
                     })}
                 />
                 <br />
@@ -513,11 +516,13 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
                     id="outlined-textarea-7"
                     type="number"
                     name="price"
+                    step="0.01"
                     placeholder="Price"
                     defaultValue={coupon.price}
                     {...register("price", {
                         required: { value: true, message: 'Missing price!' },
-                        min: { value: 1, message: "Price must be grater than zero!" }
+                        min: { value: 1, message: "Price must be grater than zero!" },
+                        pattern: { value: /^-?[0-9]\d*\.?\d*$/, message: 'Only numbers!' }
                     })}
                 />
                 <br />
@@ -550,6 +555,7 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
 
                 <label>Image</label> <br />
                 <input
+                    className="disabledArea1"
                     id="outlined-textarea-8"
                     type="text"
                     name="image"
@@ -567,7 +573,7 @@ function UpdateCompanyCoupon(props: updateCouponDetailsProps): JSX.Element {
                 {/* <Input type="submit" disabled={!isDirty || !isValid} value="Update" /> */}
 
                 <ButtonGroup variant="contained" fullWidth>
-                    <Button color="primary" disabled={!isDirty || !isValid} type="submit" value="Update">Update</Button>
+                    <Button color="primary" disabled={!isDirty || !isValid} type="submit" value="update">Update</Button>
                     <Button color="secondary" onClick={cancel}>Cancel</Button>
                 </ButtonGroup>
 
