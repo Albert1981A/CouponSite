@@ -29,7 +29,7 @@ function AdminCompanies(props: {}): JSX.Element {
                     store.dispatch(companiesDownloadedAction(response.data)); // updating AppState (global state)
                     setCompanies(store.getState().companiesState.companies); // updating the local state
                 }
-            } catch (err) {
+            } catch (err: any) {
                 notify.error(ErrMsg.ERROR_GETTING_COMPANIES);
                 notify.error(err);
             }

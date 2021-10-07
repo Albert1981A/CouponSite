@@ -1,5 +1,7 @@
-import { Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardMedia, makeStyles, Typography } from "@material-ui/core";
+import { Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardMedia, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, makeStyles, Paper, PaperProps, Typography } from "@material-ui/core";
+import React from "react";
 import { useEffect, useState } from "react";
+import Draggable from "react-draggable";
 import { NavLink, useHistory } from "react-router-dom";
 import { Unsubscribe } from "redux";
 import CompanyModel from "../../../Models/CompanyModel";
@@ -7,7 +9,7 @@ import { companiesDeletedAction } from "../../../Redux/CompaniesState";
 import store from "../../../Redux/Store";
 import globals from "../../../Service/Globals";
 import tokenAxios from "../../../Service/InterceptorAxios";
-import notify, { ErrMsg } from "../../../Service/Notification";
+import notify, { ErrMsg, SccMsg } from "../../../Service/Notification";
 import "./CompanyDetails.css";
 
 interface CompanyProps {
@@ -23,6 +25,17 @@ const useStyles = makeStyles({
     },
 });
 
+function PaperComponent(props: PaperProps) {
+    return (
+        <Draggable
+            handle="#draggable-dialog-title"
+            cancel={'[class*="MuiDialogContent-root"]'}
+        >
+            <Paper {...props} />
+        </Draggable>
+    );
+}
+
 function CompanyDetails(_props: CompanyProps): JSX.Element {
 
     const history = useHistory();
@@ -33,38 +46,64 @@ function CompanyDetails(_props: CompanyProps): JSX.Element {
         store.getState().companiesState.companies.find((c) => c.id === _props.company.id)
     );
 
-    useEffect(() => {
-        let subscription: Unsubscribe;
+    // useEffect(() => {
+    //     let subscription: Unsubscribe;
 
-        subscription = store.subscribe(() => {
-            setCompany(store.getState().companiesState.companies.find((c) => c.id === _props.company.id));
-        });
+    //     subscription = store.subscribe(() => {
+    //         setCompany(store.getState().companiesState.companies.find((c) => c.id === _props.company.id));
+    //     });
 
-        return () => {
-            function unsubscribe() {
-                subscription = store.subscribe(() => {
-                    setCompany(store.getState().companiesState.companies.find((c) => c.id === _props.company.id));
-                });
-            }
-            unsubscribe();
-        };
-    });
+    //     return () => {
+    //         function unsubscribe() {
+    //             subscription = store.subscribe(() => {
+    //                 setCompany(store.getState().companiesState.companies.find((c) => c.id === _props.company.id));
+    //             });
+    //         }
+    //         unsubscribe();
+    //     };
+    // });
+
+    const [openDelete, setOpenDelete] = React.useState(false);
+
+    const handleDeleteClickOpen = () => {
+        if (!store.getState().authState.user) {
+            notify.error(ErrMsg.PLS_LOGIN);
+            history.push("/login")
+        } else if (store.getState().authState.user?.clientType !== "ADMINISTRATOR") {
+            notify.error(ErrMsg.ONLY_COMPANY_ALLOWED);
+        } else if (!store.getState().companiesState.companies.find((c) => c.id === prop1.id)) {
+            notify.error(ErrMsg.NO_COMPANY_BY_THIS_ID);
+        } else {
+            setOpenDelete(true);
+        }
+    };
+
+    const handleDeleteClose = () => {
+        setOpenDelete(false);
+    };
 
     async function deleteCompany(id: number): Promise<void> {
-        const result = window.confirm("Are you sure you want to delete company id - " + id + "?");
-        if (result) {
-            try {
-                const response = await tokenAxios.delete<any>(globals.urls.admin + "companies/" + id);
-                store.dispatch(companiesDeletedAction(id)); // updating AppState (global state)
-            } catch (err) {
-                notify.error(ErrMsg.ERROR_DELETING_COMPANY);
-                notify.error(err);
-            }
+        setOpenDelete(false);
+        // const result = window.confirm("Are you sure you want to delete company id - " + id + "?");
+        // if (result) {
+        try {
+            const response = await tokenAxios.delete<any>(globals.urls.admin + "companies/" + id);
+            store.dispatch(companiesDeletedAction(id));
+            setCompany(store.getState().companiesState.companies.find((c) => c.id === _props.company.id));
+            notify.success(SccMsg.DELETED);
+        } catch (err: any) {
+            notify.error(ErrMsg.ERROR_DELETING_COMPANY);
+            notify.error(err);
         }
+        // }
     }
 
     function toUpdate() {
         history.push("/update-company-details/" + company.id);
+    }
+
+    function navTo() {
+        history.push("/company-card-details/" + company.id);
     }
 
     return (
@@ -72,9 +111,9 @@ function CompanyDetails(_props: CompanyProps): JSX.Element {
 
             <Card className={classes.root}>
 
-                <NavLink className="navLink" to={"/company-card-details/" + company.id} exact>
+                {/* <NavLink className="navLink" to={"/company-card-details/" + company.id} exact> */}
 
-                    <CardActionArea>
+                    <CardActionArea onClick={navTo}>
 
                         <CardMedia
                             className={classes.media}
@@ -97,22 +136,45 @@ function CompanyDetails(_props: CompanyProps): JSX.Element {
 
                     </CardActionArea>
 
-                </NavLink>
+                {/* </NavLink> */}
 
                 <CardActions>
                     <p>Operations:</p> <br />
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                         <Button color="primary" onClick={toUpdate}>
-                            {/* <NavLink className="link" to={"/update-company-details/" + prop1.id}>
-                                Update
-                            </NavLink> */}
                             Update
                         </Button>
 
-                        <Button onClick={() => deleteCompany(company.id)}>
-                            Delete
-                        </Button>
+                        {/* <Button onClick={() => deleteCompany(company.id)}>Delete</Button> */}
+                        <Button onClick={handleDeleteClickOpen}>Delete</Button>
+
+                        <Dialog
+                            open={openDelete}
+                            onClose={handleDeleteClose}
+                            PaperComponent={PaperComponent}
+                            aria-labelledby="draggable-dialog-title"
+                        >
+                            <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
+                                <Typography className="dialogTitle" gutterBottom variant="h6" component="h2">
+                                    Delete company
+                                </Typography>
+                            </DialogTitle>
+
+                            <DialogContent>
+                                <DialogContentText>
+                                    Are you sure you want to delete company id - {company.id} ?
+                                </DialogContentText>
+                            </DialogContent>
+
+                            <DialogActions>
+                                <Button autoFocus className="dialogOk" variant="contained" color="secondary" onClick={handleDeleteClose}>
+                                    Cancel
+                                </Button>
+                                <Button className="dialogOk" variant="contained" color="primary" onClick={() => deleteCompany(company.id)}>Delete</Button>
+                            </DialogActions>
+
+                        </Dialog>
                     </ButtonGroup>
                 </CardActions>
 

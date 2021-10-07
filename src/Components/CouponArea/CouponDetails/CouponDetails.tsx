@@ -1,15 +1,17 @@
-import { Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardMedia, makeStyles, Typography } from "@material-ui/core";
+import { Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardMedia, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, makeStyles, Paper, PaperProps, Typography } from "@material-ui/core";
 import moment from "moment";
+import React from "react";
 import { Component, useEffect, useState } from "react";
+import Draggable from "react-draggable";
 import { NavLink, RouteComponentProps, useHistory, useParams } from "react-router-dom";
 import { Unsubscribe } from "redux";
 import CouponsModel from "../../../Models/CouponModel";
 import CouponModel from "../../../Models/CouponModel";
-import { couponsAddedAction, couponsDeletedAction } from "../../../Redux/CouponsState";
+import { allCouponsDeletedAction, couponsAddedAction, couponsDeletedAction } from "../../../Redux/CouponsState";
 import store from "../../../Redux/Store";
 import globals from "../../../Service/Globals";
 import tokenAxios from "../../../Service/InterceptorAxios";
-import notify, { ErrMsg } from "../../../Service/Notification";
+import notify, { ErrMsg, SccMsg } from "../../../Service/Notification";
 import "./CouponDetails.css";
 
 interface RouteParams {
@@ -26,6 +28,17 @@ const useStyles = makeStyles({
         height: 110,
     },
 });
+
+function PaperComponent(props: PaperProps) {
+    return (
+        <Draggable
+            handle="#draggable-dialog-title"
+            cancel={'[class*="MuiDialogContent-root"]'}
+        >
+            <Paper {...props} />
+        </Draggable>
+    );
+}
 
 function CouponDetails(props: CouponDetailsProps): JSX.Element {
 
@@ -95,43 +108,76 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
     // const startDate = moment(coupon.startDate).format('D/M/YYYY');
     // const endDate = moment(coupon.endDate).format('D/M/YYYY');
 
+    const [openDelete, setOpenDelete] = React.useState(false);
+
+    const handleDeleteClickOpen = () => {
+        if (!store.getState().authState.user) {
+            notify.error(ErrMsg.PLS_LOGIN);
+            history.push("/login")
+        } else if (store.getState().authState.user?.clientType !== "COMPANY") {
+            notify.error(ErrMsg.ONLY_COMPANY_ALLOWED);
+        } else if (!store.getState().couponsState.coupons.find((c) => c.id === coupon.id)) {
+            notify.error(ErrMsg.COMPANY_NOT_OWN_THIS_COUPON);
+        } else {
+            setOpenDelete(true);
+        }
+    };
+
+    const handleDeleteClose = () => {
+        setOpenDelete(false);
+    };
 
     async function deleteCoupon(id: number): Promise<void> {
-        const result = window.confirm("Are you sure you want to delete coupon id - " + id + "?");
-        if (result) {
+        setOpenDelete(false);
+        // const result = window.confirm("Are you sure you want to delete coupon id - " + id + "?");
+        // if (result) {
             try {
                 const response = await tokenAxios.delete<any>(globals.urls.company + "coupons/" + id);
-                store.dispatch(couponsDeletedAction(id)); // updating AppState (global state)
+                store.dispatch(couponsDeletedAction(id));
+                store.dispatch(allCouponsDeletedAction(id));
+                notify.success(SccMsg.DELETED);
                 history.push("/company-coupons");
-            } catch (err) {
-                // alert(err.message);
+            } catch (err: any) {
                 notify.error(ErrMsg.ERROR_DELETING_COUPON);
                 notify.error(err);
             }
-        }
+        // }
     }
 
-    console.log(coupon);
+    const [open, setOpen] = React.useState(false);
 
-    async function purchaseCoupon(coupon: CouponModel): Promise<void> {
+    const handleClickOpen = () => {
         if (store.getState().authState.user?.clientType !== "CUSTOMER") {
             notify.error(ErrMsg.ONLY_CUSTOMER_ALLOWED);
         } else if (store.getState().couponsState.coupons.find((c) => c.id === id)) {
             notify.error(ErrMsg.ALREADY_OWN_THIS_COUPON);
         } else {
-            const result = window.confirm("Are you sure you want to add coupon id - " + id + "?");
-            if (result) {
-                try {
-                    const response = await tokenAxios.post<CouponsModel>(globals.urls.customer + "coupons", coupon);
-                    store.dispatch(couponsAddedAction(response.data)); // updating AppState (global state)
-                    history.push("/customer-coupons");
-                } catch (err) {
-                    // alert(err.message);
-                    notify.error(ErrMsg.ERROR_DELETING_COUPON);
-                    notify.error(err);
-                }
-            }
+            setOpen(true);
         }
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    async function purchaseCoupon(couponToSend: CouponModel): Promise<void> {
+        console.log(couponToSend);
+        setOpen(false);
+        // if (store.getState().authState.user?.clientType !== "CUSTOMER") {
+        //     notify.error(ErrMsg.ONLY_CUSTOMER_ALLOWED);
+        // } else if (store.getState().couponsState.coupons.find((c) => c.id === id)) {
+        //     notify.error(ErrMsg.ALREADY_OWN_THIS_COUPON);
+        // } else {
+        try {
+            const response = await tokenAxios.post<CouponsModel>(globals.urls.customer + "coupons", couponToSend);
+            store.dispatch(couponsAddedAction(response.data));
+            notify.success(SccMsg.PURCHASE_SUCCESS);
+            history.push("/customer-coupons");
+        } catch (err: any) {
+            notify.error(ErrMsg.ERROR_PURCHASING_COUPON);
+            notify.error(err);
+        }
+        // }
     }
 
     function yourSpace() {
@@ -161,18 +207,18 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
 
                         <CardContent>
                             <Typography className="Typography1" gutterBottom variant="h6" component="h2">
-                                Company ID: {ofAllCoupon.companyID} <br />
+                                <span>Company ID:</span> {ofAllCoupon.companyID} <br />
                                 {ofAllCoupon.title}
                             </Typography>
 
                             <Typography variant="body2" color="textSecondary" component="p">
-                                Coupon ID: &nbsp; {ofAllCoupon.id} <br />
-                                Category: <br /> {ofAllCoupon.category} <br />
-                                Description: &nbsp; {ofAllCoupon.description} <br />
-                                Amount: &nbsp; {ofAllCoupon.amount} <br />
-                                Start-Date: &nbsp; {moment(ofAllCoupon.startDate).format('D/M/YYYY')} <br />
-                                End-Date: &nbsp; {moment(ofAllCoupon.endDate).format('D/M/YYYY')} <br />
-                                Price: &nbsp; {ofAllCoupon.price}
+                            <span>Coupon ID:</span> &nbsp; {ofAllCoupon.id} <br />
+                            <span>Category:</span> <br /> {ofAllCoupon.category} <br />
+                            <span>Description:</span> &nbsp; {ofAllCoupon.description} <br />
+                            <span>Amount:</span> &nbsp; {ofAllCoupon.amount} <br />
+                            <span>Start-Date:</span> &nbsp; {moment(ofAllCoupon.startDate).format('D/M/YYYY')} <br />
+                            <span>End-Date:</span> &nbsp; {moment(ofAllCoupon.endDate).format('D/M/YYYY')} <br />
+                            <span>Price:</span> &nbsp; {ofAllCoupon.price}
                             </Typography>
 
                         </CardContent>
@@ -189,57 +235,96 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                                 <Button color="primary" onClick={yourSpace}>
-                                    {/* <NavLink className="linkTo" to={routeTo}>
-                                        Your Space
-                                    </NavLink> */}
                                     Your Space
                                 </Button>
 
                                 <Button color="primary" onClick={toMain}>
-                                    {/* <NavLink className="linkTo" to={routeTo}>
-                                        Your Space
-                                    </NavLink> */}
                                     To Main
                                 </Button>
 
                                 <Button color="primary" onClick={toUpdate}>
-                                    {/* <NavLink className="link" to={"/update-company-coupon/" + ofAllCoupon.id}>
-                                        Update
-                                    </NavLink> */}
                                     Update
                                 </Button>
 
-                                <Button onClick={() => deleteCoupon(ofAllCoupon.id)}>
+                                {/* <Button onClick={() => deleteCoupon(ofAllCoupon.id)}>Delete</Button> */}
+                                <Button onClick={handleDeleteClickOpen}>
                                     Delete
                                 </Button>
 
+                                <Dialog
+                                    open={openDelete}
+                                    onClose={handleDeleteClose}
+                                    PaperComponent={PaperComponent}
+                                    aria-labelledby="draggable-dialog-title"
+                                >
+                                    <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
+                                        <Typography className="dialogTitle" gutterBottom variant="h6" component="h2">
+                                            Delete coupon
+                                        </Typography>
+                                    </DialogTitle>
+
+                                    <DialogContent>
+                                        <DialogContentText>
+                                            Are you sure you want to delete coupon id - {coupon.id} ?
+                                        </DialogContentText>
+                                    </DialogContent>
+
+                                    <DialogActions>
+                                        <Button autoFocus className="dialogOk" variant="contained" color="secondary" onClick={handleDeleteClose}>
+                                            Cancel
+                                        </Button>
+                                        <Button className="dialogOk" variant="contained" color="primary" onClick={() => deleteCoupon(coupon.id)}>Delete</Button>
+                                    </DialogActions>
+
+                                </Dialog>
                             </ButtonGroup>
                         </div>
                     }
 
                     {store.getState().authState.user?.clientType !== 'COMPANY' &&
                         <div>
-                            <p>Operations:</p> <br />
+                            <p>Operations:</p>
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                                 <Button color="primary" onClick={yourSpace}>
-                                    {/* <NavLink className="linkTo" to={routeTo}>
-                                        Your Space
-                                    </NavLink> */}
                                     Your Space
                                 </Button>
 
                                 <Button color="primary" onClick={toMain}>
-                                    {/* <NavLink className="linkTo" to={routeTo}>
-                                        Your Space
-                                    </NavLink> */}
                                     To Main
                                 </Button>
 
-                                <Button onClick={() => purchaseCoupon(ofAllCoupon)}>
+                                {/* <Button onClick={() => purchaseCoupon(ofAllCoupon)}>Purchase</Button> */}
+                                <Button onClick={handleClickOpen}>
                                     Purchase
                                 </Button>
 
+                                <Dialog
+                                open={open}
+                                onClose={handleClose}
+                                PaperComponent={PaperComponent}
+                                aria-labelledby="draggable-dialog-title"
+                            >
+                                <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
+                                    <Typography className="dialogTitle" gutterBottom variant="h6" component="h2">
+                                        Purchase coupon
+                                    </Typography>
+                                </DialogTitle>
+
+                                <DialogContent>
+                                    <DialogContentText>
+                                        Are you sure you want to add coupon id - { id } ?
+                                    </DialogContentText>
+                                </DialogContent>
+
+                                <DialogActions>
+                                    <Button autoFocus className="dialogOk" variant="contained" color="secondary" onClick={handleClose}>
+                                        Cancel
+                                    </Button>
+                                    <Button className="dialogOk" variant="contained" color="primary" onClick={() => purchaseCoupon(ofAllCoupon)}>Purchase</Button>
+                                </DialogActions>
+
+                            </Dialog>
                             </ButtonGroup>
                         </div>
                     }

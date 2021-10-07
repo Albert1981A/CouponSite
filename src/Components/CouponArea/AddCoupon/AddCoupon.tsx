@@ -35,10 +35,6 @@ const useStyles = makeStyles((theme: Theme) =>
             margin: theme.spacing(1),
             minWidth: 120,
         },
-        // container: {
-        //     display: 'flex',
-        //     flexWrap: 'wrap',
-        // },
         textField: {
             marginLeft: theme.spacing(1),
             marginRight: theme.spacing(1),
@@ -99,7 +95,7 @@ function AddCoupon(): JSX.Element {
                 store.dispatch(allCouponsAddedAction(added));
                 notify.success(SccMsg.ADDED);
                 history.push("/company-coupons")
-            } catch (err) {
+            } catch (err: any) {
                 notify.error(ErrMsg.ERROR_WHILE_ADDING_COUPON);
                 notify.error(err);
             }

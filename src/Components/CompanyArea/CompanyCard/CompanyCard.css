@@ -8,3 +8,11 @@
     color: rgb(49, 84, 153);
 }
 
+.dialogTitle {
+    color: #00897b;
+}
+
+.dialogOk {
+    width: 100px;
+}
+

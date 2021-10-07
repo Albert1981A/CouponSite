@@ -28,7 +28,7 @@ function AdminCustomers(props: {}): JSX.Element {
                     store.dispatch(customersDownloadedAction(response.data)); // updating AppState (global state)
                     setCustomers(store.getState().customersState.customers); // updating the local state
                 }
-            } catch (err) {
+            } catch (err: any) {
                 notify.error(ErrMsg.ERROR_GETTING_CUSTOMERS);
                 notify.error(err);
             }

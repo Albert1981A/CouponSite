@@ -15,7 +15,7 @@ import "./Main.css";
 
 function Main(props: {}): JSX.Element {
 
-    let unsubscribe: Unsubscribe;
+    // let unsubscribe: Unsubscribe;
     const history = useHistory();
 
     const [allCoupons, setAllCoupons] = useState(
@@ -36,8 +36,7 @@ function Main(props: {}): JSX.Element {
                         console.log(store.getState().couponsState.allCoupons);
                         console.log("Hi... Im here 2b");
                     }
-                } catch (err) {
-                    // alert(err.message);
+                } catch (err: any) {
                     notify.error(ErrMsg.ERROR_GETTING_COUPONS);
                     notify.error(err);
                 }
@@ -46,14 +45,30 @@ function Main(props: {}): JSX.Element {
 
         asyncFunction();
 
-        unsubscribe = store.subscribe(() => {
-            setAllCoupons(store.getState().couponsState.allCoupons); // Will let us notify
-        })
+        // unsubscribe = store.subscribe(() => {
+        //     setAllCoupons(store.getState().couponsState.allCoupons); // Will let us notify
+        // })
+
+        // return () => {
+        //     unsubscribe();
+        //     console.log('Bye');
+        // };
+
+        let subscription: Unsubscribe;
+
+        subscription = store.subscribe(() => {
+            setAllCoupons(store.getState().couponsState.allCoupons);
+        });
 
         return () => {
+            function unsubscribe() {
+                subscription = store.subscribe(() => {
+                    setAllCoupons(store.getState().couponsState.allCoupons);
+                });
+            }
             unsubscribe();
-            console.log('Bye');
         };
+
     });
 
 

@@ -1,11 +1,13 @@
-import { Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardMedia, makeStyles, Typography } from "@material-ui/core";
+import { Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardMedia, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, makeStyles, Paper, PaperProps, Typography } from "@material-ui/core";
+import React from "react";
 import { useEffect, useState } from "react";
+import Draggable from "react-draggable";
 import { NavLink, RouteComponentProps, useHistory, useParams } from "react-router-dom";
 import { customersDeletedAction } from "../../../Redux/CustomersState";
 import store from "../../../Redux/Store";
 import globals from "../../../Service/Globals";
 import tokenAxios from "../../../Service/InterceptorAxios";
-import notify, { ErrMsg } from "../../../Service/Notification";
+import notify, { ErrMsg, SccMsg } from "../../../Service/Notification";
 import "./CustomerCardDetails.css";
 
 interface RouteParams {
@@ -23,6 +25,17 @@ const useStyles = makeStyles({
     },
 });
 
+function PaperComponent(props: PaperProps) {
+    return (
+        <Draggable
+            handle="#draggable-dialog-title"
+            cancel={'[class*="MuiDialogContent-root"]'}
+        >
+            <Paper {...props} />
+        </Draggable>
+    );
+}
+
 function CustomerCardDetails(props: CustomerCardDetailsProps): JSX.Element {
 
     const params = useParams<RouteParams>();
@@ -38,7 +51,6 @@ function CustomerCardDetails(props: CustomerCardDetailsProps): JSX.Element {
         }
     })
 
-    // console.log(id);
     const [customer, setCustomer] = useState(
         store.getState().customersState.customers.find((c) => c.id === id)
     );
@@ -56,19 +68,39 @@ function CustomerCardDetails(props: CustomerCardDetailsProps): JSX.Element {
         routeTo = "/company-coupons";
     }
 
+    const [openDelete, setOpenDelete] = React.useState(false);
+
+    const handleDeleteClickOpen = () => {
+        if (!store.getState().authState.user) {
+            notify.error(ErrMsg.PLS_LOGIN);
+            history.push("/login")
+        } else if (store.getState().authState.user?.clientType !== "ADMINISTRATOR") {
+            notify.error(ErrMsg.ONLY_ADMIN_ALLOWED);
+        } else if (!store.getState().customersState.customers.find((c) => c.id === id)) {
+            notify.error(ErrMsg.NO_CUSTOMER_BY_THIS_ID);
+        } else {
+            setOpenDelete(true);
+        }
+    };
+
+    const handleDeleteClose = () => {
+        setOpenDelete(false);
+    };
+
     async function deleteCustomer(id: number): Promise<void> {
-        const result = window.confirm("Are you sure you want to delete customer id - " + id + "?");
-        if (result) {
+        setOpenDelete(false);
+        // const result = window.confirm("Are you sure you want to delete customer id - " + id + "?");
+        // if (result) {
             try {
                 const response = await tokenAxios.delete<any>(globals.urls.admin + "customers/" + id);
-                store.dispatch(customersDeletedAction(id)); // updating AppState (global state)
+                store.dispatch(customersDeletedAction(id));
                 history.push("/admin-customers");
-            } catch (err) {
-                // alert(err.message);
+                notify.success(SccMsg.DELETED);
+            } catch (err: any) {
                 notify.error(ErrMsg.ERROR_DELETING_CUSTOMER);
                 notify.error(err);
             }
-        }
+        // }
     }
 
     function goBack() {
@@ -83,8 +115,6 @@ function CustomerCardDetails(props: CustomerCardDetailsProps): JSX.Element {
         <div className="CustomerCardDetails">
 
             <Card className={classes.root}>
-
-                {/* <NavLink className="navLink" to={"/customer-card-details/" + customer.id} exact> */}
 
                 <CardActionArea className="navLink2">
 
@@ -109,29 +139,50 @@ function CustomerCardDetails(props: CustomerCardDetailsProps): JSX.Element {
 
                 </CardActionArea>
 
-                {/* </NavLink> */}
 
                 <CardActions>
                     <p>Operations:</p> <br />
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                         <Button color="primary" onClick={goBack}>
-                            {/* <NavLink className="link" to={routeTo}>
-                                Go Back
-                            </NavLink> */}
                             Back
                         </Button>
 
                         <Button color="primary" onClick={goToUpdate}>
-                            {/* <NavLink className="link" to={"/update-customer-details/" + customer.id}>
-                                Update
-                            </NavLink> */}
                             Update
                         </Button>
 
-                        <Button onClick={() => deleteCustomer(customer.id)}>
+                        {/* <Button onClick={() => deleteCustomer(customer.id)}>Delete</Button> */}
+                        <Button onClick={handleDeleteClickOpen}>
                             Delete
                         </Button>
+
+                        <Dialog
+                            open={openDelete}
+                            onClose={handleDeleteClose}
+                            PaperComponent={PaperComponent}
+                            aria-labelledby="draggable-dialog-title"
+                        >
+                            <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
+                                <Typography className="dialogTitle" gutterBottom variant="h6" component="h2">
+                                    Delete customer
+                                </Typography>
+                            </DialogTitle>
+
+                            <DialogContent>
+                                <DialogContentText>
+                                    Are you sure you want to delete customer id - {customer.id} ?
+                                </DialogContentText>
+                            </DialogContent>
+
+                            <DialogActions>
+                                <Button autoFocus className="dialogOk" variant="contained" color="secondary" onClick={handleDeleteClose}>
+                                    Cancel
+                                </Button>
+                                <Button className="dialogOk" variant="contained" color="primary" onClick={() => deleteCustomer(customer.id)}>Delete</Button>
+                            </DialogActions>
+
+                        </Dialog>
 
                     </ButtonGroup>
                 </CardActions>
