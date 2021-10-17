@@ -59,11 +59,31 @@ function CompanyCard(_props: CardProps): JSX.Element {
         store.getState().authState.user
     );
 
-    const [coupon, setCoupon] = useState(
+    const [ coupon, setCoupon ] = useState(
         store.getState().couponsState.allCoupons.find(c => c.id === _props.coupon.id)
     );
 
+    const [ company, setCompany ] = useState<CompanyModel>( null );
+
+    async function asyncCompanyFunction() {
+        if (company === null) {
+            try {
+                const response = await tokenAxios.get<CompanyModel>(globals.urls.admin + "companies/" + prop1.companyID);
+                console.log(response.data);
+                if (response.data !== null) {
+                    // store.dispatch(companiesDownloadedAction(response.data)); 
+                    setCompany(response.data); 
+                }
+            } catch (err: any) {
+                notify.error(ErrMsg.ERROR_GETTING_COMPANIES);
+                notify.error(err);
+            }
+        }
+    }
+
     useEffect(() => {
+
+
         let subscription: Unsubscribe;
 
         subscription = store.subscribe(() => {
@@ -177,6 +197,7 @@ function CompanyCard(_props: CardProps): JSX.Element {
                     <CardMedia
                         className={classes.media}
                         image={`${process.env.PUBLIC_URL}/assets/images/` + prop1.image}
+                        // image={ globals.urls.company + "images/" + company.imageID }
                         title="Company Coupon"
                     />
 

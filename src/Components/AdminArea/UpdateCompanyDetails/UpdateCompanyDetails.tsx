@@ -85,6 +85,18 @@ function UpdateCompanyDetails(props: updateCompanyDetailsProps): JSX.Element {
             notify.error(ErrMsg.UNABLE_TO_UPDATE_COMPANY_NAME);
         } else {
             try {
+                console.log("hi... im Here - 1");
+                // const formData = new FormData();
+                // formData.append("id", companyToSend.id.toString());
+                // formData.append("name", companyToSend.name);
+                // formData.append("email", companyToSend.email);
+                // formData.append("password", companyToSend.password);
+                // formData.append("image", company.image.item(0));
+                // formData.append("imageID", company.imageID);
+                companyToSend.image = company.image;
+                companyToSend.imageID = company.imageID;
+
+                console.log("hi... im Here - 2");
                 const response = await tokenAxios.put<CompanyModel>(globals.urls.admin + "companies", companyToSend);
                 const added = response.data;
                 // console.log(added);
@@ -93,7 +105,7 @@ function UpdateCompanyDetails(props: updateCompanyDetailsProps): JSX.Element {
                 notify.success(SccMsg.UPDATED);
                 history.push('/admin-companies');
             }
-            catch (err) {
+            catch (err: any) {
                 notify.error(ErrMsg.UNABLE_TO_UPDATE_COMPANY);
                 const err1 = err as AxiosError
                 if (err1.response) {
@@ -194,6 +206,39 @@ function UpdateCompanyDetails(props: updateCompanyDetailsProps): JSX.Element {
                 <br />
                 <span className="errorMessage">{errors.password?.message}</span>
                 <br />
+
+                {/* public image ? : FileList NO*/}
+                {/* <label>Image</label> <br />
+                <input
+                    className="disabledArea1"
+                    id="outlined-textarea-2"
+                    type="file"
+                    name="image"
+                    placeholder="Image"
+                    {...register("image", {
+                        required: { value: true, message: 'Missing company image' }
+                    })}
+                />
+                <br />
+                <span className="errorMessage">{errors.imageID?.message}</span>
+                <br /> */}
+
+                {/* public imageID ? : string NO*/}
+                {/* <label>Image Id</label> <br />
+                <input
+                    className="disabledArea1"
+                    id="outlined-textarea-2"
+                    type="text"
+                    name="imageID"
+                    placeholder="Image-Id"
+                    value={company.imageID}
+                    {...register("imageID", {
+                        required: { value: true, message: 'Missing company image id' }
+                    })}
+                />
+                <br />
+                <span className="errorMessage">{errors.imageID?.message}</span>
+                <br /> */}
 
                 <ButtonGroup variant="contained" fullWidth>
                     <Button color="primary" disabled={!isDirty || !isValid} type="submit" value="Update">Update</Button>

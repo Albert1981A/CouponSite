@@ -10,7 +10,8 @@ export enum CustomersActionType {
     CustomersDownloaded = "CustomersDownloaded",
     CustomerAdded = "CustomerAdded",
     CustomerUpdated = "CustomerUpdated",
-    CustomerDeleted = "CustomerDeleted"
+    CustomerDeleted = "CustomerDeleted",
+    CustomerDeleteAll = "CustomerDeleteAll"
 }
 
 // Step 3 - Define Action Interface to describe actionAction & payload if needed
@@ -36,6 +37,10 @@ export function customersDeletedAction(id: number): CustomerAction {
     return { type: CustomersActionType.CustomerDeleted, payload: id };
 }
 
+export function customersDeleteAllAction(): CustomerAction {
+    return { type: CustomersActionType.CustomerDeleteAll };
+}
+
 // Step 5 - Reducer function perform the required action
 export function customersReducer(currentState: CustomersAppState = new CustomersAppState(), action: CustomerAction): CustomersAppState {
     
@@ -59,6 +64,9 @@ export function customersReducer(currentState: CustomersAppState = new Customers
         case CustomersActionType.CustomerDeleted:
             newState.customers = newState.customers.filter(c => c.id !== action.payload);
             // newState.customers.fill;
+            break;
+        case CustomersActionType.CustomerDeleted:
+            newState.customers = [];
             break;
     }
     return newState;

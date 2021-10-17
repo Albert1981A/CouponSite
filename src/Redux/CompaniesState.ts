@@ -11,7 +11,8 @@ export enum CompaniesActionType {
     CompaniesDownloaded = "CompaniesDownloaded",
     CompanyAdded = "CompanyAdded",
     CompanyUpdated = "CompanyUpdated",
-    CompanyDeleted = "CompanyDeleted"
+    CompanyDeleted = "CompanyDeleted",
+    CompanyDeleteAll = "CompanyDeleteAll"
 }
 
 // Step 3 - Define Action Interface to describe actionAction & payload if needed
@@ -37,6 +38,10 @@ export function companiesDeletedAction(id: number): CompanyAction {
     return { type: CompaniesActionType.CompanyDeleted, payload: id };
 }
 
+export function companiesDeleteAllAction(): CompanyAction {
+    return { type: CompaniesActionType.CompanyDeleteAll };
+}
+
 // Step 5 - Reducer function perform the required action
 export function companiesReducer(currentState: CompaniesAppState = new CompaniesAppState(), action: CompanyAction): CompaniesAppState {
     
@@ -60,6 +65,9 @@ export function companiesReducer(currentState: CompaniesAppState = new Companies
         case CompaniesActionType.CompanyDeleted:
             newState.companies = newState.companies.filter(c => c.id !== action.payload);
             // newState.companies.fill;
+            break;
+        case CompaniesActionType.CompanyDeleteAll:
+            newState.companies = [];
             break;
     }
     return newState;

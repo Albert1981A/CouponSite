@@ -1,4 +1,5 @@
 import { Box, Button, ButtonGroup, Grid, Typography } from "@material-ui/core";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { BrowserRouter, useHistory } from "react-router-dom";
 import { Unsubscribe } from "redux";
@@ -27,7 +28,7 @@ function Main(props: {}): JSX.Element {
             if (allCoupons.length === 0) {
                 try {
                     console.log("Hi... Im here 1");
-                    const response = await tokenAxios.get<CouponsModel[]>(globals.urls.client + "coupons");
+                    const response = await axios.get<CouponsModel[]>(globals.urls.client + "get-coupons");
                     console.log(response.data);
                     if (response.data.length !== 0) {
                         store.dispatch(allCouponsDownloadedAction(response.data)); // updating AppState (global state)

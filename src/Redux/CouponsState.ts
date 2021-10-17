@@ -43,7 +43,7 @@ export function couponsDeletedAction(id: number): CouponAction {
 }
 
 export function couponsDeleteAllAction(): CouponAction {
-    return { type: CouponsActionType.CouponDeleteAll};
+    return { type: CouponsActionType.CouponDeleteAll };
 }
 
 // new

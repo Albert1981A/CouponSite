@@ -2,32 +2,32 @@ import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import CouponModel from "../../../Models/CouponModel";
 import { logoutAction } from "../../../Redux/AuthAppState";
+import { companiesDeleteAllAction, companiesDeletedAction } from "../../../Redux/CompaniesState";
 import { couponsDeleteAllAction, couponsUpdatedAction } from "../../../Redux/CouponsState";
+import { customersDeleteAllAction } from "../../../Redux/CustomersState";
 import store from "../../../Redux/Store";
 import globals from "../../../Service/Globals";
 import tokenAxios from "../../../Service/InterceptorAxios";
-import notify, { SccMsg } from "../../../Service/Notification";
+import notify, { ErrMsg, SccMsg } from "../../../Service/Notification";
 
 function Logout(): JSX.Element {
 
-    // const [logoutDetails, setLogoutDetails] = useState(store.getState().authState.user.clientToken);
     const history = useHistory();
     
-    async function logoutBack() {
+    async function logoutBack(): Promise<void> {
         try {
-            // console.log(logoutDetails);
-            // console.log(globals.urls.client + "logout");
-            const response = await tokenAxios.delete(globals.urls.client + "logout");
+            const response = await tokenAxios.delete<any>(globals.urls.client + "logout");
             store.dispatch(couponsDeleteAllAction());
-            console.log(response);
-            
+            store.dispatch(companiesDeleteAllAction());
+            store.dispatch(customersDeleteAllAction());
         }
-        catch (err) {
-            notify.error(err);
+        catch (err: any) {
+            notify.error(ErrMsg.ERROR_LOGOUT);
+            notify.error(err.massage);
         }
     }
 
-    useEffect(()=> //React Hook for running side effects inside a fc
+    useEffect(() => 
     { 
         logoutBack();
         notify.success(SccMsg.LOGOUT_SUCCESS);

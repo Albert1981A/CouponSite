@@ -2,6 +2,7 @@ import { Box, Button, ButtonGroup, Grid, Input, Typography } from "@material-ui/
 import { SyntheticEvent, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Unsubscribe } from "redux";
+import CompanyLoadModel from "../../../Models/CompanyLoadModel";
 import CompanyModel from "../../../Models/CompanyModel";
 import { companiesDownloadedAction } from "../../../Redux/CompaniesState";
 import store from "../../../Redux/Store";

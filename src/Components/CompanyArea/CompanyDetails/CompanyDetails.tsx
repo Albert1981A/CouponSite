@@ -1,9 +1,14 @@
 import { Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardMedia, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, makeStyles, Paper, PaperProps, Typography } from "@material-ui/core";
+import { Image } from "@material-ui/icons";
+import { id } from "date-fns/locale";
+import { stringify } from "querystring";
 import React from "react";
 import { useEffect, useState } from "react";
 import Draggable from "react-draggable";
 import { NavLink, useHistory } from "react-router-dom";
 import { Unsubscribe } from "redux";
+import { idText } from "typescript";
+import CompanyLoadModel from "../../../Models/CompanyLoadModel";
 import CompanyModel from "../../../Models/CompanyModel";
 import { companiesDeletedAction } from "../../../Redux/CompaniesState";
 import store from "../../../Redux/Store";
@@ -46,23 +51,6 @@ function CompanyDetails(_props: CompanyProps): JSX.Element {
         store.getState().companiesState.companies.find((c) => c.id === _props.company.id)
     );
 
-    // useEffect(() => {
-    //     let subscription: Unsubscribe;
-
-    //     subscription = store.subscribe(() => {
-    //         setCompany(store.getState().companiesState.companies.find((c) => c.id === _props.company.id));
-    //     });
-
-    //     return () => {
-    //         function unsubscribe() {
-    //             subscription = store.subscribe(() => {
-    //                 setCompany(store.getState().companiesState.companies.find((c) => c.id === _props.company.id));
-    //             });
-    //         }
-    //         unsubscribe();
-    //     };
-    // });
-
     const [openDelete, setOpenDelete] = React.useState(false);
 
     const handleDeleteClickOpen = () => {
@@ -93,7 +81,7 @@ function CompanyDetails(_props: CompanyProps): JSX.Element {
             notify.success(SccMsg.DELETED);
         } catch (err: any) {
             notify.error(ErrMsg.ERROR_DELETING_COMPANY);
-            notify.error(err);
+            notify.error(err.massage);
         }
         // }
     }
@@ -106,37 +94,50 @@ function CompanyDetails(_props: CompanyProps): JSX.Element {
         history.push("/company-card-details/" + company.id);
     }
 
+    // useEffect(() => {
+    //         let subscription: Unsubscribe;
+
+    //         subscription = store.subscribe(() => {
+    //             setCompany(store.getState().companiesState.companies.find((c) => c.id === _props.company.id));
+    //         });
+
+    //         return () => {
+    //             function unsubscribe() {
+    //                 subscription = store.subscribe(() => {
+    //                     setCompany(store.getState().companiesState.companies.find((c) => c.id === _props.company.id));
+    //                 });
+    //             }
+    //             unsubscribe();
+    //         };
+    // });
+
     return (
         <div className="CompanyDetails">
 
             <Card className={classes.root}>
 
-                {/* <NavLink className="navLink" to={"/company-card-details/" + company.id} exact> */}
+                <CardActionArea onClick={navTo}>
 
-                    <CardActionArea onClick={navTo}>
+                    <CardMedia
+                        className={classes.media}
+                        // image={`${process.env.PUBLIC_URL}/assets/images/` + company.name + '.jpg'}
+                        image={ globals.urls.company + "images/" + company.imageID }
+                        title="Company details"
+                    />
 
-                        <CardMedia
-                            className={classes.media}
-                            image={`${process.env.PUBLIC_URL}/assets/images/` + company.name + '.jpg'}
-                            title="Company details"
-                        />
+                    <CardContent>
+                        <Typography gutterBottom variant="h6" component="h2">
+                            Name: {company.name} <br />
+                            ID: {company.id}
+                        </Typography>
 
+                        <Typography variant="body2" color="textSecondary" component="p">
+                            Email: <br /> {company.email}
+                        </Typography>
 
-                        <CardContent>
-                            <Typography gutterBottom variant="h6" component="h2">
-                                Name: {company.name} <br />
-                                ID: {company.id}
-                            </Typography>
+                    </CardContent>
 
-                            <Typography variant="body2" color="textSecondary" component="p">
-                                Email: <br /> {company.email}
-                            </Typography>
-
-                        </CardContent>
-
-                    </CardActionArea>
-
-                {/* </NavLink> */}
+                </CardActionArea>
 
                 <CardActions>
                     <p>Operations:</p> <br />

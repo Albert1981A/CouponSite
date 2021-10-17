@@ -121,7 +121,8 @@ function CompanyCardDetails(props: CompanyCardDetailsProps): JSX.Element {
 
                     <CardMedia
                         className={classes.media}
-                        image={`${process.env.PUBLIC_URL}/assets/images/` + company.name + '.jpg'}
+                        // image={`${process.env.PUBLIC_URL}/assets/images/` + company.name + '.jpg'}
+                        image={ globals.urls.company + "images/" + company.imageID }
                         title="Company details"
                     />
 

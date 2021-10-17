@@ -58,12 +58,6 @@ function AdminAddCompany(): JSX.Element {
     const { register, handleSubmit, formState: { errors, isDirty, isValid } } = useForm<CompanyLoadModel>({ mode: "onTouched" });
 
     async function send(companyToSend: CompanyLoadModel) {
-        
-        // console.log(companyToSend);
-        // console.log(companyToSend.image);
-
-        // var fs = require('fs');
-        // fs.writeFile(`${process.env.PUBLIC_URL}/assets/images/` + companyToSend.image, companyToSend.image, 'binary');
 
         if (store.getState().companiesState.companies.find(c => c.name === companyToSend.name)) {
             notify.error(ErrMsg.COMPANY_NAME_EXIST);
@@ -71,7 +65,16 @@ function AdminAddCompany(): JSX.Element {
             notify.error(ErrMsg.COMPANY_EMAIL_EXIST);
         } else {
             try {
-                const response = await tokenAxios.post<CompanyModel>(globals.urls.admin + "companies", companyToSend);
+                console.log(companyToSend.image.item(0));
+
+                const formData = new FormData();
+                formData.append("name", companyToSend.name);
+                formData.append("email", companyToSend.email);
+                formData.append("password", companyToSend.password);
+                formData.append("imageID", undefined);
+                formData.append("image", companyToSend.image.item(0));
+
+                const response = await tokenAxios.post<CompanyModel>(globals.urls.admin + "companies", formData);
                 const added = response.data;
                 console.log(added);
                 store.dispatch(companiesAddedAction(added));
@@ -185,8 +188,6 @@ function AdminAddCompany(): JSX.Element {
                         minLength: { value: 2, message: 'Minimum length of 2 Characters!' },
                     })}
                 />
-
-
 
                 <ButtonGroup variant="contained" fullWidth>
                     <Button color="primary" disabled={!isDirty || !isValid} type="submit" value="create">Add Company</Button>
