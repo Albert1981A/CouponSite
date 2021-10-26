@@ -16,7 +16,6 @@ import "./Main.css";
 
 function Main(props: {}): JSX.Element {
 
-    // let unsubscribe: Unsubscribe;
     const history = useHistory();
 
     const [allCoupons, setAllCoupons] = useState(
@@ -27,15 +26,12 @@ function Main(props: {}): JSX.Element {
         async function asyncFunction() {
             if (allCoupons.length === 0) {
                 try {
-                    console.log("Hi... Im here 1");
                     const response = await axios.get<CouponsModel[]>(globals.urls.client + "get-coupons");
                     console.log(response.data);
                     if (response.data.length !== 0) {
                         store.dispatch(allCouponsDownloadedAction(response.data)); // updating AppState (global state)
                         setAllCoupons(store.getState().couponsState.allCoupons); // updating the local state
-                        console.log("Hi... Im here 2");
                         console.log(store.getState().couponsState.allCoupons);
-                        console.log("Hi... Im here 2b");
                     }
                 } catch (err: any) {
                     notify.error(ErrMsg.ERROR_GETTING_COUPONS);
@@ -45,15 +41,6 @@ function Main(props: {}): JSX.Element {
         }
 
         asyncFunction();
-
-        // unsubscribe = store.subscribe(() => {
-        //     setAllCoupons(store.getState().couponsState.allCoupons); // Will let us notify
-        // })
-
-        // return () => {
-        //     unsubscribe();
-        //     console.log('Bye');
-        // };
 
         let subscription: Unsubscribe;
 

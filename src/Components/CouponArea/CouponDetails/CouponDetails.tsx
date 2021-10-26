@@ -131,16 +131,16 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
         setOpenDelete(false);
         // const result = window.confirm("Are you sure you want to delete coupon id - " + id + "?");
         // if (result) {
-            try {
-                const response = await tokenAxios.delete<any>(globals.urls.company + "coupons/" + id);
-                store.dispatch(couponsDeletedAction(id));
-                store.dispatch(allCouponsDeletedAction(id));
-                notify.success(SccMsg.DELETED);
-                history.push("/company-coupons");
-            } catch (err: any) {
-                notify.error(ErrMsg.ERROR_DELETING_COUPON);
-                notify.error(err);
-            }
+        try {
+            const response = await tokenAxios.delete<any>(globals.urls.company + "coupons/" + id);
+            store.dispatch(couponsDeletedAction(id));
+            store.dispatch(allCouponsDeletedAction(id));
+            notify.success(SccMsg.DELETED);
+            history.push("/company-coupons");
+        } catch (err: any) {
+            notify.error(ErrMsg.ERROR_DELETING_COUPON);
+            notify.error(err);
+        }
         // }
     }
 
@@ -201,24 +201,25 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
 
                         <CardMedia
                             className={classes.media}
-                            image={`${process.env.PUBLIC_URL}/assets/images/` + ofAllCoupon.image}
+                            // image={`${process.env.PUBLIC_URL}/assets/images/` + ofAllCoupon.image}
+                            image={ globals.urls.company + "images/company-id/" + ofAllCoupon.companyID }
                             title="Contemplative Reptile"
                         />
 
                         <CardContent>
                             <Typography className="Typography1" gutterBottom variant="h6" component="h2">
-                                <span>Company ID:</span> {ofAllCoupon.companyID} <br />
-                                {ofAllCoupon.title}
+                                Company ID: <span className="spanGetDetails">{ofAllCoupon.companyID}</span> <br />
                             </Typography>
 
                             <Typography variant="body2" color="textSecondary" component="p">
-                            <span>Coupon ID:</span> &nbsp; {ofAllCoupon.id} <br />
-                            <span>Category:</span> <br /> {ofAllCoupon.category} <br />
-                            <span>Description:</span> &nbsp; {ofAllCoupon.description} <br />
-                            <span>Amount:</span> &nbsp; {ofAllCoupon.amount} <br />
-                            <span>Start-Date:</span> &nbsp; {moment(ofAllCoupon.startDate).format('D/M/YYYY')} <br />
-                            <span>End-Date:</span> &nbsp; {moment(ofAllCoupon.endDate).format('D/M/YYYY')} <br />
-                            <span>Price:</span> &nbsp; {ofAllCoupon.price}
+                                Coupon ID: &nbsp; <span className="spanGetDetails">{ofAllCoupon.id}</span> <br />
+                                Title: &nbsp; <span className="spanGetDetails">{ofAllCoupon.title}</span> <br />
+                                Description: &nbsp; <span className="spanGetDetails">{ofAllCoupon.description}</span> <br />
+                                Amount: &nbsp; <span className="spanGetDetails">{ofAllCoupon.amount}</span> <br />
+                                Start-Date: &nbsp; <span className="spanGetDetails">{moment(ofAllCoupon.startDate).format('D/M/YYYY')}</span> <br />
+                                End-Date: &nbsp; <span className="spanGetDetails">{moment(ofAllCoupon.endDate).format('D/M/YYYY')}</span> <br />
+                                Price: &nbsp; <span className="spanGetDetails">{ofAllCoupon.price}</span> <br />
+                                Category: <br /> <span className="spanGetDetails">{ofAllCoupon.category}</span>
                             </Typography>
 
                         </CardContent>
@@ -231,7 +232,6 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
                     {store.getState().authState.user?.clientType === 'COMPANY' &&
                         store.getState().couponsState.coupons.find((c) => c.id === coupon.id) &&
                         <div>
-                            <p>Operations:</p> <br />
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                                 <Button color="primary" onClick={yourSpace}>
@@ -283,7 +283,6 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
 
                     {store.getState().authState.user?.clientType !== 'COMPANY' &&
                         <div>
-                            <p>Operations:</p>
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                                 <Button color="primary" onClick={yourSpace}>
@@ -300,31 +299,31 @@ function CouponDetails(props: CouponDetailsProps): JSX.Element {
                                 </Button>
 
                                 <Dialog
-                                open={open}
-                                onClose={handleClose}
-                                PaperComponent={PaperComponent}
-                                aria-labelledby="draggable-dialog-title"
-                            >
-                                <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
-                                    <Typography className="dialogTitle" gutterBottom variant="h6" component="h2">
-                                        Purchase coupon
-                                    </Typography>
-                                </DialogTitle>
+                                    open={open}
+                                    onClose={handleClose}
+                                    PaperComponent={PaperComponent}
+                                    aria-labelledby="draggable-dialog-title"
+                                >
+                                    <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
+                                        <Typography className="dialogTitle" gutterBottom variant="h6" component="h2">
+                                            Purchase coupon
+                                        </Typography>
+                                    </DialogTitle>
 
-                                <DialogContent>
-                                    <DialogContentText>
-                                        Are you sure you want to add coupon id - { id } ?
-                                    </DialogContentText>
-                                </DialogContent>
+                                    <DialogContent>
+                                        <DialogContentText>
+                                            Are you sure you want to add coupon id - {id} ?
+                                        </DialogContentText>
+                                    </DialogContent>
 
-                                <DialogActions>
-                                    <Button autoFocus className="dialogOk" variant="contained" color="secondary" onClick={handleClose}>
-                                        Cancel
-                                    </Button>
-                                    <Button className="dialogOk" variant="contained" color="primary" onClick={() => purchaseCoupon(ofAllCoupon)}>Purchase</Button>
-                                </DialogActions>
+                                    <DialogActions>
+                                        <Button autoFocus className="dialogOk" variant="contained" color="secondary" onClick={handleClose}>
+                                            Cancel
+                                        </Button>
+                                        <Button className="dialogOk" variant="contained" color="primary" onClick={() => purchaseCoupon(ofAllCoupon)}>Purchase</Button>
+                                    </DialogActions>
 
-                            </Dialog>
+                                </Dialog>
                             </ButtonGroup>
                         </div>
                     }

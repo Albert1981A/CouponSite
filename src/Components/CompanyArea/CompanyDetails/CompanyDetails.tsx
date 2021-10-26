@@ -126,13 +126,13 @@ function CompanyDetails(_props: CompanyProps): JSX.Element {
                     />
 
                     <CardContent>
-                        <Typography gutterBottom variant="h6" component="h2">
-                            Name: {company.name} <br />
-                            ID: {company.id}
+                        <Typography className="Typography1" gutterBottom variant="h6" component="h2">
+                            Company ID: <span className="spanGetDetails">{company.id}</span>
                         </Typography>
 
                         <Typography variant="body2" color="textSecondary" component="p">
-                            Email: <br /> {company.email}
+                            Name: <span className="spanGetDetails">{company.name}</span> <br />
+                            Email: <span className="spanGetDetails">{company.email}</span>
                         </Typography>
 
                     </CardContent>
@@ -140,7 +140,7 @@ function CompanyDetails(_props: CompanyProps): JSX.Element {
                 </CardActionArea>
 
                 <CardActions>
-                    <p>Operations:</p> <br />
+                    
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                         <Button color="primary" onClick={toUpdate}>

@@ -65,7 +65,7 @@ function AdminAddCompany(): JSX.Element {
             notify.error(ErrMsg.COMPANY_EMAIL_EXIST);
         } else {
             try {
-                console.log(companyToSend.image.item(0));
+                // console.log(companyToSend.image.item(0));
 
                 const formData = new FormData();
                 formData.append("name", companyToSend.name);
@@ -178,14 +178,15 @@ function AdminAddCompany(): JSX.Element {
                 <br />
                 <br /> */}
 
+                <label className="labelAdd">Image</label>
                 <input
                     type="file"
                     id="myFile"
                     name="profile_pic"
                     accept=".jpg, .jpeg, .png"
+                    placeholder="Image"
                     {...register("image", {
                         required: { value: true, message: 'Missing image!' },
-                        minLength: { value: 2, message: 'Minimum length of 2 Characters!' },
                     })}
                 />
 

@@ -111,35 +111,31 @@ function CustomerDetails(_props: CustomerProps): JSX.Element {
 
             <Card className={classes.root}>
 
-                {/* <NavLink className="navLink" to={"/customer-card-details/" + customer.id} exact> */}
-
                     <CardActionArea onClick={navTo}>
 
                         <CardMedia
                             className={classes.media}
-                            image={`${process.env.PUBLIC_URL}/assets/images/customer/customer.png`}
+                            // image={`${process.env.PUBLIC_URL}/assets/images/customer/customer.png`}
+                            image={ globals.urls.customer + "images/customer-id/" + customer.id }
                             title="Customer details"
                         />
 
                         <CardContent>
-                            <Typography gutterBottom variant="h6" component="h2">
-                                Customer ID: {customer.id}
+                            <Typography className="Typography1" gutterBottom variant="h6" component="h2">
+                                Customer ID: <span className="spanGetDetails">{customer.id}</span>
                             </Typography>
 
                             <Typography variant="body2" color="textSecondary" component="p">
-                                First name: {customer.firstName} <br />
-                                Last name: {customer.lastName} <br />
-                                Email:  &nbsp; {customer.email}
+                                First name: <span className="spanGetDetails">{customer.firstName}</span> <br />
+                                Last name: <span className="spanGetDetails">{customer.lastName}</span> <br />
+                                Email:  &nbsp; <span className="spanGetDetails">{customer.email}</span>
                             </Typography>
 
                         </CardContent>
 
                     </CardActionArea>
 
-                {/* </NavLink> */}
-
                 <CardActions>
-                    <p>Operations:</p>
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                         <Button color="primary" onClick={toUpdate}>

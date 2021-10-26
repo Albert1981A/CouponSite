@@ -57,12 +57,19 @@ function AdminAddCustomer(): JSX.Element {
     const { register, handleSubmit, formState: { errors, isDirty, isValid } } = useForm<CustomerModel>({ mode: "onTouched" });
 
     async function send(customerToSend: CustomerModel) {
-        console.log(customerToSend);
+        // console.log(customerToSend);
         if (store.getState().companiesState.companies.find(c => c.email === customerToSend.email)) {
             notify.error(ErrMsg.CUSTOMER_EMAIL_EXIST);
         } else {
+            const formData = new FormData();
+            formData.append("firstName", customerToSend.firstName);
+            formData.append("lastName", customerToSend.lastName);
+            formData.append("email", customerToSend.email);
+            formData.append("password", customerToSend.password);
+            formData.append("imageID", undefined);
+            formData.append("image", customerToSend.image.item(0));
             try {
-                const response = await tokenAxios.post<CustomerModel>(globals.urls.admin + "customers", customerToSend);
+                const response = await tokenAxios.post<CustomerModel>(globals.urls.admin + "customers", formData);
                 const added = response.data;
                 console.log(added);
                 store.dispatch(customersAddedAction(added));
@@ -128,7 +135,7 @@ function AdminAddCustomer(): JSX.Element {
                 <br />
                 <span className="errorMessage">{errors.lastName?.message}</span>
                 <br />
-                
+
                 {/* public email ? : string NO*/}
                 <TextField
                     id="outlined-textarea-2"
@@ -167,6 +174,18 @@ function AdminAddCustomer(): JSX.Element {
                 <br />
                 <span className="errorMessage">{errors.password?.message}</span>
                 <br />
+
+                <label className="labelAdd">Image</label>
+                <input
+                    type="file"
+                    id="myFile"
+                    name="profile_pic"
+                    accept=".jpg, .jpeg, .png"
+                    placeholder="Image"
+                    {...register("image", {
+                        required: { value: true, message: 'Missing image!' },
+                    })}
+                />
 
                 <ButtonGroup variant="contained" fullWidth>
                     <Button color="primary" disabled={!isDirty || !isValid} type="submit" value="create">Add Customer</Button>

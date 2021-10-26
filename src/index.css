@@ -32,3 +32,12 @@ code {
   border-radius: 10px 10px;
   box-shadow: 2px;
 }
+
+.spanGetDetails {
+  color: rgb(91, 123, 124);
+  font-weight: bold;
+}
+
+.Typography1 {
+    color: #00897b;
+}

@@ -120,19 +120,20 @@ function CustomerCardDetails(props: CustomerCardDetailsProps): JSX.Element {
 
                     <CardMedia
                         className={classes.media}
-                        image={`${process.env.PUBLIC_URL}/assets/images/customer/customer.png`}
+                        // image={`${process.env.PUBLIC_URL}/assets/images/customer/customer.png`}
+                        image={ globals.urls.customer + "images/customer-id/" + customer.id }
                         title="Company details"
                     />
 
                     <CardContent>
-                        <Typography gutterBottom variant="h6" component="h2">
-                            ID: {customer.id}
+                        <Typography className="Typography1" gutterBottom variant="h6" component="h2">
+                            ID: <span className="spanGetDetails">{customer.id}</span>
                         </Typography>
 
                         <Typography variant="body2" color="textSecondary" component="p">
-                            First name: {customer.firstName} <br />
-                            Last name: {customer.lastName} <br />
-                            Email:  &nbsp; {customer.email}
+                            First name: <span className="spanGetDetails">{customer.firstName}</span> <br />
+                            Last name: <span className="spanGetDetails">{customer.lastName}</span> <br />
+                            Email:  &nbsp; <span className="spanGetDetails">{customer.email}</span>
                         </Typography>
 
                     </CardContent>
@@ -141,7 +142,6 @@ function CustomerCardDetails(props: CustomerCardDetailsProps): JSX.Element {
 
 
                 <CardActions>
-                    <p>Operations:</p> <br />
                     <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                         <Button color="primary" onClick={goBack}>

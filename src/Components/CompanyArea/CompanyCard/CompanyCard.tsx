@@ -59,31 +59,29 @@ function CompanyCard(_props: CardProps): JSX.Element {
         store.getState().authState.user
     );
 
-    const [ coupon, setCoupon ] = useState(
+    const [coupon, setCoupon] = useState(
         store.getState().couponsState.allCoupons.find(c => c.id === _props.coupon.id)
     );
 
-    const [ company, setCompany ] = useState<CompanyModel>( null );
+    // const [ company, setCompany ] = useState<CompanyModel>( null );
 
-    async function asyncCompanyFunction() {
-        if (company === null) {
-            try {
-                const response = await tokenAxios.get<CompanyModel>(globals.urls.admin + "companies/" + prop1.companyID);
-                console.log(response.data);
-                if (response.data !== null) {
-                    // store.dispatch(companiesDownloadedAction(response.data)); 
-                    setCompany(response.data); 
-                }
-            } catch (err: any) {
-                notify.error(ErrMsg.ERROR_GETTING_COMPANIES);
-                notify.error(err);
-            }
-        }
-    }
+    // async function asyncCompanyFunction() {
+    //     if (company === null) {
+    //         try {
+    //             const response = await tokenAxios.get<CompanyModel>(globals.urls.admin + "companies/" + prop1.companyID);
+    //             console.log(response.data);
+    //             if (response.data !== null) {
+    //                 // store.dispatch(companiesDownloadedAction(response.data)); 
+    //                 setCompany(response.data); 
+    //             }
+    //         } catch (err: any) {
+    //             notify.error(ErrMsg.ERROR_GETTING_COMPANIES);
+    //             notify.error(err);
+    //         }
+    //     }
+    // }
 
     useEffect(() => {
-
-
         let subscription: Unsubscribe;
 
         subscription = store.subscribe(() => {
@@ -196,25 +194,25 @@ function CompanyCard(_props: CardProps): JSX.Element {
 
                     <CardMedia
                         className={classes.media}
-                        image={`${process.env.PUBLIC_URL}/assets/images/` + prop1.image}
-                        // image={ globals.urls.company + "images/" + company.imageID }
+                        // image={`${process.env.PUBLIC_URL}/assets/images/` + prop1.image}
+                        image={globals.urls.company + "images/company-id/" + prop1.companyID}
                         title="Company Coupon"
                     />
 
                     <CardContent>
-                        <Typography gutterBottom variant="h6" component="h2">
-                            Company ID: {prop1.companyID} <br />
-                            {prop1.title}
+                        <Typography className="Typography1" gutterBottom variant="h6" component="h2">
+                            Company ID: <span className="spanGetDetails">{prop1.companyID}</span> <br />
                         </Typography>
 
                         <Typography variant="body2" color="textSecondary" component="p">
-                            Coupon Id:  &nbsp; {prop1.id} <br />
-                            Category: <br /> {prop1.category} <br />
-                            Description: &nbsp; {prop1.description} <br />
-                            Amount: &nbsp; {prop1.amount} <br />
-                            Start-Date: &nbsp; {startDate} <br />
-                            End-Date: &nbsp; {endDate} <br />
-                            Price: &nbsp; {prop1.price}
+                            Coupon Id:  &nbsp; <span className="spanGetDetails">{prop1.id}</span> <br />
+                            Title: &nbsp; <span className="spanGetDetails">{prop1.title}</span> <br />
+                            Description: &nbsp; <span className="spanGetDetails">{prop1.description}</span> <br />
+                            Amount: &nbsp; <span className="spanGetDetails">{prop1.amount}</span> <br />
+                            Start-Date: &nbsp; <span className="spanGetDetails">{startDate}</span> <br />
+                            End-Date: &nbsp; <span className="spanGetDetails">{endDate}</span> <br />
+                            Price: &nbsp; <span className="spanGetDetails">{prop1.price}</span> <br />
+                            Category: <br /> <span className="spanGetDetails">{prop1.category}</span>
                         </Typography>
 
                     </CardContent>
@@ -226,7 +224,6 @@ function CompanyCard(_props: CardProps): JSX.Element {
 
                     {!user &&
                         <div>
-                            <p>Operations:</p>
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
                                 {/* <Button onClick={() => purchaseCoupon(prop1)}>Purchase</Button> */}
                                 <Button onClick={handleClickOpen}>Purchase</Button>
@@ -237,7 +234,6 @@ function CompanyCard(_props: CardProps): JSX.Element {
                     {(user?.clientType === 'COMPANY') &&
                         store.getState().couponsState.coupons.find((c) => c.id === prop1.id) &&
                         <div>
-                            <p>Operations:</p>
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
 
                                 <Button color="primary">
@@ -248,7 +244,7 @@ function CompanyCard(_props: CardProps): JSX.Element {
 
                                 {/* <Button onClick={() => deleteCoupon(prop1.id)}>Delete</Button> */}
                                 <Button onClick={handleDeleteClickOpen}>Delete</Button>
-                                
+
                                 <Dialog
                                     open={openDelete}
                                     onClose={handleDeleteClose}
@@ -283,7 +279,6 @@ function CompanyCard(_props: CardProps): JSX.Element {
                     {(user?.clientType === 'CUSTOMER') &&
                         !store.getState().couponsState.coupons.find((c) => c.id === prop1.id) &&
                         <div>
-                            <p>Operations:</p>
                             <ButtonGroup color="primary" size="small" aria-label="outlined primary button group">
                                 {/* <Button onClick={() => purchaseCoupon(prop1)}>Purchase</Button> */}
                                 <Button onClick={handleClickOpen}>Purchase</Button>
